@@ -1,5 +1,5 @@
 ---
-name: ifc-revit-parametrizacao
+name: ifc-especialista
 description: Orienta como parametrizar corretamente tipos/familias do Revit para exportacao IFC (IfcExportAs, Type IFC Predefined Type), evitando categorias vazias, duplicadas ou invalidas. Cobre tambem como criar e validar arquivos IDS (Information Delivery Specification, buildingSMART) para exigir parametros obrigatorios no modelo, incluindo os erros de schema mais comuns. Usar quando o usuario for configurar parametros IFC de familias no Revit antes de exportar, revisar Categoria/PredefinedType de um IFC ja exportado, criar/validar um .ids, ou usar Classification Manager / Model Checker / IFC Tester.
 ---
 

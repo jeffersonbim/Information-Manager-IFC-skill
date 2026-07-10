@@ -1,4 +1,4 @@
-# IFC Revit Parametrizacao — Skill
+# IFC Especialista — Skill
 
 Skill do Claude Code (`SKILL.md`) pra parametrizar corretamente Revit→IFC
 (`IfcExportAs`, `Type IFC Predefined Type`) e criar/validar arquivos **IDS**
