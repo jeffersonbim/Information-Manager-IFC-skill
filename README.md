@@ -1,4 +1,4 @@
-# IFC Especialista
+#Especialist IFC
 
 Skill do [Claude Code](https://claude.com/claude-code) especializada em parametrização IFC no Revit e validação de requisitos de informação via IDS (Information Delivery Specification, buildingSMART).
 
