@@ -271,3 +271,49 @@ predefined = elutil.get_predefined_type(elemento)
 ```
 
 Compara `Qto_XxxBaseQuantities.GrossXxx` vs `NetXxx` do mesmo elemento -- se forem identicos (diferenca so' ruido de ponto flutuante ~1e-15), o exportador Revit nao descontou vao/abertura, e' bug de exportacao, nao do processo de analise.
+
+## Prompts de auditoria (adaptados do ebook "120 Prompts BIM" -- Agostinho Couto/MU-Gen)
+
+Prompts uteis pra rodar em cima do CSV/xlsx ja exportado do Bonsai (`ifc_consolidado_*.csv`) ou dos Psets do projeto (`Pset_SINAPI`, `Pset_ProjetoInfo.FaseDoProjeto`, `Pset_ProjetoInfo.ObjetivoSetor`, `Pset_ProjetoInfo.PeDireito`). Nao substituem o `.ids`/`ifctester` (validacao formal) -- servem pra relatorio legivel por humano/cliente a partir do mesmo dado.
+
+### Auditoria Informacional Completa
+
+```
+Com base neste extrato/lista/IFC [COLAR CSV EXPORTADO DO BONSAI], gera uma
+Auditoria Informacional Completa:
+I. Parametros obrigatorios vs. preenchidos (Pset_SINAPI.SINAPI,
+   Pset_ProjetoInfo.FaseDoProjeto, Pset_ProjetoInfo.ObjetivoSetor,
+   Pset_ProjetoInfo.PeDireito) -- tabela por disciplina, % conformidade
+II. Inconsistencias detectadas (formatacao, valores fora do intervalo)
+III. Anomalias (elementos sem parametro, campos vazios criticos, duplicados)
+IV. Impacto no processo BIM (coordenacao, IFC, QTO, LOIN)
+V. Prioridades (Alta/Media/Baixa)
+VI. Resumo executivo (<10 linhas)
+```
+
+### Validacao LOIN (Previsto vs Real)
+
+```
+Compara este LOIN [4 parametros obrigatorios do projeto] com estes dados
+de modelo [COLAR CSV/IFC] e gera tabela "Previsto vs. Atual", elementos
+nao conformes, parametros em falta, lista de correcoes urgentes.
+```
+
+Complementa o `.ids` -- roda o `.ids` primeiro (fonte de verdade, pass/fail
+formal), depois usa este prompt pra transformar o resultado em relatorio
+legivel pro cliente/responsavel Revit.
+
+### RFI pra pendencia de parametro
+
+```
+Redige um RFI sobre [PARAMETRO] nao preenchido em [N] elementos da
+categoria [X], incluindo: contexto, elementos/GlobalId envolvidos, impacto
+(bloqueia validacao IDS / exportacao), prazo desejado, responsavel.
+```
+
+Usar quando o `.ids` reportar `(N/M) FAIL` com N alto -- formaliza a
+pendencia em vez de só reportar o numero.
+
+Fonte completa dos 120 prompts (7 modulos: Gestao de Projetos, Documentacao
+Tecnica, Coordenacao BIM, QA/QC Digital, Lean BIM, Visualizacao,
+Integracao/Automacao): `D:\IFC\Ebook-IA BIM.pdf`.
