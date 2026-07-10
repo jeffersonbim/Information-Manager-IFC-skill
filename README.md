@@ -1,30 +1,44 @@
-# IFC Especialista — Skill
+# IFC Especialista
 
-Skill do Claude Code (`SKILL.md`) pra parametrizar corretamente Revit→IFC
-(`IfcExportAs`, `Type IFC Predefined Type`) e criar/validar arquivos **IDS**
-(Information Delivery Specification, buildingSMART) exigindo parametros
-obrigatorios no modelo.
+Skill do [Claude Code](https://claude.com/claude-code) especializada em parametrização IFC no Revit e validação de requisitos de informação via IDS (Information Delivery Specification, buildingSMART).
 
-> ⚠️ Status: privado enquanto a skill está em teste.
+> **Status:** repositório privado enquanto a skill está em validação prática.
 
-## O que cobre
+## Objetivo
 
-- Diagnostico e formato correto do `IfcExportAs` (evita erro tipo material-como-categoria, `USERDEFINED` evitavel, classe IFC4 num projeto IFC2x3)
-- Tabela de enums validos por classe (IFC2x3)
-- Template de checkset Model Checker (XML)
-- **IDS**: estrutura, erros de schema reais encontrados na pratica, template pronto, como validar (`ifctester`) e rodar contra IFC de verdade
-- Referencias oficiais buildingSMART: IDS, bSDD (dicionario de classificacao), BCF (coordenacao/clash), IDS-Audit-Tool (validador mais rigoroso)
+Reduzir o tempo entre "exportei IFC do Revit" e "o modelo tem os parâmetros certos, na categoria certa, validáveis por padrão aberto" — sem depender de tentativa e erro repetido a cada exportação.
 
-## Skill irmã
+## Conteúdo da skill
 
-`autodesk-bim-interoperability-tools` — cobre as ferramentas Autodesk
-(Shared Parameters Tool, Standardized Data Tool, Model Checker Configurator,
-COBie Extension, Room & Area Sync) que geram/corrigem os parametros que
-essa skill valida.
+| Área | O que cobre |
+|---|---|
+| Diagnóstico de exportação | Checklist para validar `Export Type to IFC As`, `Type IFC Predefined Type` e `IFCExportAs` antes de exportar; erros reais já identificados (material usado como categoria, `USERDEFINED` evitável, classe IFC4 num projeto IFC2x3) |
+| Enums IFC2x3 | Tabela de valores válidos de `PredefinedType` por classe mais comum |
+| Model Checker | Template de checkset XML pronto para adaptar |
+| IDS | Estrutura de um `.ids`, os dois erros de schema mais comuns na prática (formato de e-mail do `<author>`, cardinalidade não vai em `<specification>`), template mínimo reutilizável, comandos de validação (`ifctester`) e de execução contra um IFC real |
+| Padrões abertos buildingSMART | Referência cruzada a IDS, bSDD (dicionário de classificação), BCF (coordenação/clash) e IDS-Audit-Tool (validador oficial mais rigoroso que o `ifctester`) |
+| Auditoria via IA | Prompts de auditoria informacional, validação LOIN e RFI de pendência de parâmetro, adaptados do ebook *120 Prompts BIM* (Agostinho Couto / MU-Gen) para rodar sobre exports reais do Bonsai |
+| Verificação programática | Snippets `ifcopenshell` para confirmar correções fora do Revit (PredefinedType com fallback de tipo, Gross vs Net) |
+
+## Quando usar
+
+- Configurar parâmetros IFC de famílias/tipos no Revit antes de exportar
+- Revisar categoria/`PredefinedType` de um IFC já exportado
+- Criar ou validar um arquivo `.ids`
+- Usar Classification Manager, Model Checker ou IFC Tester (Bonsai)
+
+## Instalação
+
+```bash
+git clone https://github.com/jeffmodeler/ifc-especialista-skill.git ~/.claude/skills/ifc-especialista
+```
+
+O Claude Code carrega a skill automaticamente a partir de `~/.claude/skills/`.
+
+## Skill relacionada
+
+[`autodesk-bim-interoperability-tools`](https://github.com/jeffmodeler/autodesk-bim-interoperability-tools-skill) — cobre o lado Autodesk (Shared Parameters Tool, Standardized Data Tool, Model Checker Configurator, COBie Extension, Room & Area Sync) que gera os parâmetros que esta skill valida. Esta skill cobre o lado ifcopenshell/Blender/buildingSMART do mesmo fluxo.
 
 ## Origem
 
-Nasceu de uma sessão de debug real corrigindo exportação IFC de um modelo
-Revit real (bugs encontrados: `IfcExportAs` com material em vez de
-categoria, `USERDEFINED` evitável, filtro com vírgula quebrando no Bonsai,
-campos `.id` crashando query, `Gross`=`Net` em quantidade de parede).
+Construída a partir de uma sessão real de debug de exportação IFC de um modelo Revit em produção. Cada seção documenta um bug ou erro de schema efetivamente encontrado e corrigido — não é teoria, é o registro do que quebrou e de como foi resolvido.
