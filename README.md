@@ -1,8 +1,6 @@
-#Especialist IFC
+# Information Manager IFC Skill
 
 Skill do [Claude Code](https://claude.com/claude-code) especializada em parametrização IFC no Revit e validação de requisitos de informação via IDS (Information Delivery Specification, buildingSMART).
-
-> **Status:** repositório privado enquanto a skill está em validação prática.
 
 ## Objetivo
 
@@ -30,15 +28,19 @@ Reduzir o tempo entre "exportei IFC do Revit" e "o modelo tem os parâmetros cer
 ## Instalação
 
 ```bash
-git clone https://github.com/jeffmodeler/ifc-especialista-skill.git ~/.claude/skills/ifc-especialista
+git clone https://github.com/jeffersonbim/Information-Manager-IFC-skill.git ~/.claude/skills/ifc-especialista
 ```
 
 O Claude Code carrega a skill automaticamente a partir de `~/.claude/skills/`.
 
 ## Skill relacionada
 
-[`autodesk-bim-interoperability-tools`](https://github.com/jeffmodeler/autodesk-bim-interoperability-tools-skill) — cobre o lado Autodesk (Shared Parameters Tool, Standardized Data Tool, Model Checker Configurator, COBie Extension, Room & Area Sync) que gera os parâmetros que esta skill valida. Esta skill cobre o lado ifcopenshell/Blender/buildingSMART do mesmo fluxo.
+[`autodesk-bim-interoperability-tools`](https://github.com/jeffersonbim/autodesk-bim-interoperability-tools-skill) — cobre o lado Autodesk (Shared Parameters Tool, Standardized Data Tool, Model Checker Configurator, COBie Extension, Room & Area Sync) que gera os parâmetros que esta skill valida. Esta skill cobre o lado ifcopenshell/Blender/buildingSMART do mesmo fluxo.
 
 ## Origem
 
 Construída a partir de uma sessão real de debug de exportação IFC de um modelo Revit em produção. Cada seção documenta um bug ou erro de schema efetivamente encontrado e corrigido — não é teoria, é o registro do que quebrou e de como foi resolvido.
+
+## Licença
+
+[MIT](LICENSE) — use, modifique e redistribua livremente, inclusive em projetos comerciais.
