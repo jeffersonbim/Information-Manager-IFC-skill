@@ -1,0 +1,13 @@
+[
+  {
+    "path": "agents.defaults.sandbox.docker.binds",
+    "value": [
+      "__SKILL_ROOT__/data/input:/dados-ifc:ro",
+      "__SKILL_ROOT__:/skills/information-manager-ifc:ro"
+    ]
+  },
+  {
+    "path": "agents.defaults.sandbox.docker.dangerouslyAllowExternalBindSources",
+    "value": true
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "path": "agents.defaults.sandbox",
+    "value": {
+      "mode": "all",
+      "backend": "docker",
+      "scope": "agent",
+      "workspaceAccess": "ro",
+      "docker": {
+        "readOnlyRoot": true,
+        "network": "none",
+        "capDrop": ["ALL"]
+      }
+    }
+  },
+  {
+    "path": "agents.list[5].sandbox",
+    "value": {
+      "docker": {
+        "network": "bridge"
+      }
+    }
+  }
+]
