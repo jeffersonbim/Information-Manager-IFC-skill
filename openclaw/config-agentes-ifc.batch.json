@@ -1,0 +1,18 @@
+[
+  { "path": "agents.defaults.subagents.maxSpawnDepth", "value": 1 },
+  { "path": "agents.defaults.subagents.maxChildrenPerAgent", "value": 5 },
+  { "path": "agents.defaults.subagents.maxConcurrent", "value": 5 },
+  { "path": "agents.defaults.subagents.runTimeoutSeconds", "value": 900 },
+  { "path": "agents.defaults.subagents.requireAgentId", "value": true },
+  { "path": "agents.list[0].workspace", "value": "__SKILL_ROOT__/openclaw/workspaces/ifc-orchestrator" },
+  { "path": "agents.list[0].tools", "value": { "profile": "minimal", "alsoAllow": ["sessions_spawn", "sessions_yield", "subagents"] } },
+  { "path": "agents.list[0].subagents", "value": { "allowAgents": ["ifc-inventory", "ifc-class-worker", "ifc-relations", "ids-validator", "bsdd-researcher", "bcf-coordinator", "ifc-consolidator"], "requireAgentId": true, "delegationMode": "prefer" } },
+  { "path": "agents.list[1].tools", "value": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+  { "path": "agents.list[2].tools", "value": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+  { "path": "agents.list[3].tools", "value": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+  { "path": "agents.list[4].tools", "value": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+  { "path": "agents.list[5].tools", "value": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+  { "path": "agents.list[6].tools", "value": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+  { "path": "agents.list[7].tools", "value": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+  { "path": "tools.subagents.tools.deny", "value": ["gateway", "cron", "message"] }
+]

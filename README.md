@@ -1,46 +1,59 @@
 # Information Manager IFC Skill
 
-Skill do [Claude Code](https://claude.com/claude-code) especializada em parametrização IFC no Revit e validação de requisitos de informação via IDS (Information Delivery Specification, buildingSMART).
+Skill modular para gestão da informação BIM, organizada em cinco conhecimentos especializados:
 
-## Objetivo
+1. Revit–IFC: configuração, exportação e rastreabilidade por versão.
+2. IDS: formalização e validação de requisitos de informação.
+3. ISO 19650: requisitos, planos de entrega, CDE e estados da informação.
+4. bSDD: pesquisa de dicionários, classes e propriedades por URI estável.
+5. BCF: gestão de tópicos, responsáveis, estados e evidências de coordenação.
 
-Reduzir o tempo entre "exportei IFC do Revit" e "o modelo tem os parâmetros certos, na categoria certa, validáveis por padrão aberto" — sem depender de tentativa e erro repetido a cada exportação.
+O arquivo `SKILL.md` funciona como roteador. O conteúdo técnico fica em `references/`, evitando carregar conhecimento que não seja necessário à tarefa.
 
-## Conteúdo da skill
+## Mapeamentos Revit/IFC e COBie
 
-| Área | O que cobre |
-|---|---|
-| Diagnóstico de exportação | Checklist para validar `Export Type to IFC As`, `Type IFC Predefined Type` e `IFCExportAs` antes de exportar; erros reais já identificados (material usado como categoria, `USERDEFINED` evitável, classe IFC4 num projeto IFC2x3) |
-| Enums IFC2x3 | Tabela de valores válidos de `PredefinedType` por classe mais comum |
-| Model Checker | Template de checkset XML pronto para adaptar |
-| IDS | Estrutura de um `.ids`, os dois erros de schema mais comuns na prática (formato de e-mail do `<author>`, cardinalidade não vai em `<specification>`), template mínimo reutilizável, comandos de validação (`ifctester`) e de execução contra um IFC real |
-| Padrões abertos buildingSMART | Referência cruzada a IDS, bSDD (dicionário de classificação), BCF (coordenação/clash) e IDS-Audit-Tool (validador oficial mais rigoroso que o `ifctester`) |
-| Auditoria via IA | Prompts de auditoria informacional, validação LOIN e RFI de pendência de parâmetro, adaptados do ebook *120 Prompts BIM* (Agostinho Couto / MU-Gen) para rodar sobre exports reais do Bonsai |
-| Verificação programática | Snippets `ifcopenshell` para confirmar correções fora do Revit (PredefinedType com fallback de tipo, Gross vs Net) |
+A skill inclui quatro fontes autorizadas e um parser determinístico para consultar nomes, GUIDs, tipos de dados e escopo de instância/tipo:
 
-## Quando usar
-
-- Configurar parâmetros IFC de famílias/tipos no Revit antes de exportar
-- Revisar categoria/`PredefinedType` de um IFC já exportado
-- Criar ou validar um arquivo `.ids`
-- Usar Classification Manager, Model Checker ou IFC Tester (Bonsai)
-
-## Instalação
-
-```bash
-git clone https://github.com/jeffersonbim/Information-Manager-IFC-skill.git ~/.claude/skills/ifc-especialista
+```powershell
+python scripts/parameter_mappings.py stats
+python scripts/parameter_mappings.py query CasingDepth --scope type
 ```
 
-O Claude Code carrega a skill automaticamente a partir de `~/.claude/skills/`.
+O mapeamento regional IFC-SG/Singapura não está incluído nem é carregado pelo parser. Consulte `references/parameter-mappings.md` para proveniência, hashes e limites de interpretação.
 
-## Skill relacionada
+## Consulta bSDD
 
-[`autodesk-bim-interoperability-tools`](https://github.com/jeffersonbim/autodesk-bim-interoperability-tools-skill) — cobre o lado Autodesk (Shared Parameters Tool, Standardized Data Tool, Model Checker Configurator, COBie Extension, Room & Area Sync) que gera os parâmetros que esta skill valida. Esta skill cobre o lado ifcopenshell/Blender/buildingSMART do mesmo fluxo.
+O cliente `scripts/bsdd_client.py` implementa operações públicas e somente leitura da API oficial, sem dependências externas:
 
-## Origem
+```powershell
+python scripts/bsdd_client.py dictionaries --limit 5
+python scripts/bsdd_client.py search-classes parede --dictionary-uri "URI_DO_DICIONARIO"
+python scripts/bsdd_client.py class "URI_DA_CLASSE" --language pt-BR
+python scripts/bsdd_client.py class-properties "URI_DA_CLASSE"
+python scripts/bsdd_client.py property "URI_DA_PROPRIEDADE"
+python scripts/bsdd_client.py text-search fire --type-filter Property
+```
 
-Construída a partir de uma sessão real de debug de exportação IFC de um modelo Revit em produção. Cada seção documenta um bug ou erro de schema efetivamente encontrado e corrigido — não é teoria, é o registro do que quebrou e de como foi resolvido.
+A saída é JSON estruturada, apropriada para scripts e nós Execute Command/Code do n8n. Ela registra URL consultada, contrato e instante UTC; os dados permanecem dinâmicos. Resultados da API são evidência técnica, enquanto decisões de conformidade continuam exigindo o requisito contratual e aprovação humana.
+
+## OpenClaw
+
+Instale a pasta completa como skill gerenciada:
+
+```powershell
+Copy-Item -LiteralPath . -Destination "$HOME/.openclaw/skills/information-manager-ifc" -Recurse
+```
+
+Substitua `__SKILL_ROOT__` nos arquivos de exemplo pelo caminho absoluto da skill e incorpore a configuração ao `~/.openclaw/openclaw.json`. O exemplo usa sandbox Docker, workspaces somente leitura, profundidade 1 e allowlist explícita de agentes. Acesso de rede é liberado apenas para `bsdd-researcher`.
+
+## Testes
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+Contrato usado: [buildingSMART Dictionaries API v1](https://app.swaggerhub.com/apis/buildingSMART/Dictionaries/v1). Base de produção: `https://api.bsdd.buildingsmart.org`.
 
 ## Licença
 
-[MIT](LICENSE) — use, modifique e redistribua livremente, inclusive em projetos comerciais.
+O código e a documentação autoral deste repositório usam [MIT](LICENSE). Os quatro TXT em `references/parameter-mappings/sources/` vêm do projeto Autodesk Revit IFC e permanecem sob LGPLv2; consulte [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

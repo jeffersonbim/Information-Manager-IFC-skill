@@ -1,0 +1,51 @@
+{
+  "agents": {
+    "defaults": {
+      "subagents": {
+        "maxSpawnDepth": 1,
+        "maxChildrenPerAgent": 5,
+        "maxConcurrent": 5,
+        "runTimeoutSeconds": 900,
+        "archiveAfterMinutes": 60,
+        "requireAgentId": true
+      },
+      "sandbox": {
+          "mode": "all",
+          "backend": "docker",
+          "scope": "agent",
+          "workspaceAccess": "ro",
+          "docker": {
+            "readOnlyRoot": true,
+            "network": "none",
+            "capDrop": ["ALL"]
+          }
+      }
+    },
+    "list": [
+      {
+        "id": "ifc-orchestrator",
+        "workspace": "__SKILL_ROOT__/openclaw/workspaces/ifc-orchestrator",
+        "tools": { "profile": "minimal", "alsoAllow": ["sessions_spawn", "sessions_yield", "subagents"] },
+        "subagents": {
+          "allowAgents": ["ifc-inventory", "ifc-class-worker", "ifc-relations", "ids-validator", "bsdd-researcher", "bcf-coordinator", "ifc-consolidator"],
+          "requireAgentId": true,
+          "delegationMode": "prefer"
+        }
+      },
+      { "id": "ifc-inventory", "workspace": "__SKILL_ROOT__/openclaw/workspaces/ifc-inventory", "tools": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+      { "id": "ifc-class-worker", "workspace": "__SKILL_ROOT__/openclaw/workspaces/ifc-class-worker", "tools": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+      { "id": "ifc-relations", "workspace": "__SKILL_ROOT__/openclaw/workspaces/ifc-relations", "tools": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+      { "id": "ids-validator", "workspace": "__SKILL_ROOT__/openclaw/workspaces/ids-validator", "tools": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+      { "id": "bsdd-researcher", "workspace": "__SKILL_ROOT__/openclaw/workspaces/bsdd-researcher", "tools": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] }, "sandbox": { "docker": { "network": "bridge" } } },
+      { "id": "bcf-coordinator", "workspace": "__SKILL_ROOT__/openclaw/workspaces/bcf-coordinator", "tools": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+      { "id": "ifc-consolidator", "workspace": "__SKILL_ROOT__/openclaw/workspaces/ifc-consolidator", "tools": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } }
+    ]
+  },
+  "tools": {
+    "subagents": {
+      "tools": {
+        "deny": ["gateway", "cron", "message"]
+      }
+    }
+  }
+}

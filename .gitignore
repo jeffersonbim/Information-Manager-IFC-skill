@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+openclaw/workspaces/**/BOOTSTRAP.md
+openclaw/workspaces/**/HEARTBEAT.md
+openclaw/workspaces/**/IDENTITY.md
+openclaw/workspaces/**/SOUL.md
+openclaw/workspaces/**/TOOLS.md
+openclaw/workspaces/**/USER.md
+openclaw/workspaces/**/openclaw-workspace-state.json
