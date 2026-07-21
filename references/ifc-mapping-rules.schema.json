@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/information-manager-ifc/ifc-mapping-rules.schema.json",
+  "title": "Matriz de mapeamento autoral para IFC",
+  "type": "object",
+  "required": ["version", "ifc_schema", "mappings"],
+  "properties": {
+    "version": { "type": "string", "minLength": 1 },
+    "ifc_schema": { "type": "string", "minLength": 1 },
+    "idm_use_case": { "type": "string" },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["rule_id", "category", "allowed_mappings"],
+        "properties": {
+          "rule_id": { "type": "string", "minLength": 1 },
+          "category": { "type": "string", "minLength": 1 },
+          "family_pattern": { "type": "string", "default": "*" },
+          "type_pattern": { "type": "string", "default": "*" },
+          "not_applicable": { "type": "boolean", "default": false },
+          "allowed_mappings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["ifc_class", "predefined_types"],
+              "properties": {
+                "ifc_class": { "type": "string", "pattern": "^Ifc[A-Za-z0-9_]+$" },
+                "predefined_types": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+              }
+            }
+          },
+          "requirements": {
+            "type": "object",
+            "properties": {
+              "explicit_export_as": { "type": "boolean", "default": false },
+              "explicit_predefined_type": { "type": "boolean", "default": false },
+              "allow_not_defined": { "type": "boolean", "default": false }
+            }
+          }
+        }
+      }
+    }
+  }
+}
