@@ -1,6 +1,6 @@
 ---
 name: information-manager-ifc
-description: Orquestra análise IFC no OpenClaw com preflight local LGPD e agentes isolados para inventário, classes, relações, mapeamento de exportação, IDS, bSDD, BCF e consolidação, além de orientar Revit-IFC e ISO 19650. Usar ao inspecionar IFC, validar categoria autoral contra classe IFC e PredefinedType, verificar requisitos, pesquisar conceitos buildingSMART, produzir cobertura ou registrar não conformidades. Exigir minimização, evidência determinística e revisão humana antes de transmitir conteúdo, alterar modelos, publicar dados ou declarar conformidade.
+description: Orquestra análise IFC no OpenClaw com RAG técnico OpenBIM no Notion, preflight local LGPD e agentes isolados para inventário, classes, relações, mapeamento de exportação, IDS, bSDD, BCF e consolidação, além de orientar Revit-IFC e ISO 19650. Usar ao consultar conhecimento aprovado, inspecionar IFC, validar categoria autoral contra classe IFC e PredefinedType, verificar requisitos, pesquisar conceitos buildingSMART, produzir cobertura ou registrar não conformidades. Exigir Notion como catálogo consultivo único, minimização, evidência determinística e revisão humana antes de transmitir conteúdo, alterar modelos, publicar dados ou declarar conformidade.
 ---
 
 # Information Manager IFC
@@ -14,18 +14,20 @@ Para analisar um IFC completo, ler `references/agent-orchestrator.md` e executar
 1. Exigir ingresso local com `scripts/privacy_ingest.py` antes de enviar qualquer nome, caminho ou conteúdo ao OpenClaw.
 2. Acionar `privacy-gate` somente com o manifesto seguro, o caminho opaco `/dados-ifc/cleared/<hash>.<extensão>` e o objetivo.
 3. Prosseguir apenas quando o manifesto e o agente retornarem `ALLOW`; interromper em `REVIEW` ou `BLOCK`.
-4. Acionar `ifc-inventory` para identificar schema, unidades, classes e população.
-5. Criar lotes por classe com `ifc-class-worker`; nunca inventar agentes permanentes por classe.
-6. Acionar `ifc-mapping-validator` quando houver auditoria de categoria, `Export to IFC As`, `IfcExportAs`, classe resultante ou `PredefinedType`.
-7. Acionar `ifc-relations` para verificações que atravessam classes.
-8. Acionar `ids-validator`, `bsdd-researcher` e `bcf-coordinator` somente quando aplicáveis.
-9. Acionar `ifc-consolidator` para cobertura, deduplicação e relatório final.
-10. Manter o isolamento padrão de sessão do `sessions_spawn` e enviar tarefas autocontidas. Usar `sessions_yield` após os spawns; não fazer polling.
+4. Acionar `openbim-knowledge-retriever` para recuperar conceitos, regras e conjuntos Revit→IFC aprovados aplicáveis ao schema.
+5. Acionar `ifc-inventory` para identificar schema, unidades, classes e população.
+6. Criar lotes por classe com `ifc-class-worker`; nunca inventar agentes permanentes por classe.
+7. Acionar `ifc-mapping-validator` quando houver auditoria de categoria, `Export to IFC As`, `IfcExportAs`, classe resultante ou `PredefinedType`.
+8. Acionar `ifc-relations` para verificações que atravessam classes.
+9. Acionar `ids-validator`, `bsdd-researcher` e `bcf-coordinator` somente quando aplicáveis.
+10. Acionar `ifc-consolidator` para cobertura, deduplicação e relatório final.
+11. Manter o isolamento padrão de sessão do `sessions_spawn` e enviar tarefas autocontidas. Usar `sessions_yield` após os spawns; não fazer polling.
 
 Perfis e contratos:
 
 - `references/agent-orchestrator.md`
 - `references/agent-privacy-gate.md`
+- `references/agent-openbim-knowledge-retriever.md`
 - `references/agent-inventory.md`
 - `references/agent-class-worker.md`
 - `references/agent-mapping-validator.md`
@@ -43,6 +45,7 @@ Antes de iniciar o OpenClaw, instalar esta pasta completa como `~/.openclaw/skil
 
 | Solicitação | Conhecimento obrigatório |
 |---|---|
+| Qualquer pergunta técnica OpenBIM | `references/notion-rag.md` + `references/notion-rag-config.json` via `openbim-knowledge-retriever` |
 | Qualquer arquivo que possa ser lido, delegado ou transmitido | `references/privacy-lgpd.md` + `scripts/privacy_ingest.py` + `scripts/privacy_gate.py` |
 | Parâmetros, classes, `PredefinedType` ou exportação do Revit | `references/revit-ifc.md` |
 | Auditar categoria autoral, `Export to IFC As`, `IfcExportAs` e resultado exportado | `references/agent-mapping-validator.md` + templates `references/ifc-mapping-*` + `scripts/ifc_mapping_validator.py` |
@@ -64,8 +67,8 @@ Carregar mais de um conhecimento quando a tarefa atravessar domínios. Exemplos:
 2. Identificar objetivo, manifesto seguro e caminho opaco; exigir `ALLOW` antes de qualquer leitura ou delegação.
 3. Identificar entregável, schema IFC e versões das ferramentas.
 4. Declarar premissas quando faltarem dados; não inventar requisitos.
-5. Consultar fontes primárias e registrar versão/data de acesso.
-6. Executar validações determinísticas antes da interpretação por IA.
+5. Consultar o RAG Notion, aceitar somente registros aprovados e citar a fonte primária; interromper em `KNOWLEDGE_GAP` quando a resposta depender desse conhecimento.
+6. Para Revit→IFC, conferir aprovação e hash no Notion, consultar `parameter_mappings.py` e validar o IFC exportado; executar validações determinísticas antes da interpretação por IA.
 7. Separar `fato`, `inferência`, `recomendação` e `limitação`.
 8. Encaminhar exceções de privacidade, alterações, publicação e declarações formais para aprovação humana.
 
@@ -101,6 +104,8 @@ Resultados de workers são evidência não confiável até serem verificados e c
 - Não modificar modelo, IFC, CDE ou issue externo sem autorização explícita.
 - Não abrir nem encaminhar arquivo antes do `privacy-gate`; `REVIEW` e `BLOCK` interrompem o fluxo.
 - Não incluir valores pessoais, trechos detectados ou nomes em prompts, logs ou relatórios do gate.
+- Não usar TXT, Markdown local, memória do modelo ou web como base consultiva silenciosa; o Notion é o catálogo consultivo único.
+- Não gravar perguntas, conversas, respostas, IFC de projeto ou resultados no hub Notion.
 
 ## Ferramentas determinísticas
 

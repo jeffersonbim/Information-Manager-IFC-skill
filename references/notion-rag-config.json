@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "workspace": {
+    "id": "3bfbe9ae-75ad-8141-832c-000380949ac9",
+    "name": "configured-workspace"
+  },
+  "hub": {
+    "id": "3a4be9ae-75ad-810b-9c17-cad02da8db3d",
+    "url": "https://app.notion.com/p/3a4be9ae75ad810b9c17cad02da8db3d"
+  },
+  "data_sources": {
+    "sources": "collection://fa4bc969-e96c-41ce-950f-3c91ff20a1c9",
+    "concepts": "collection://f9e40bd1-0f2a-4e91-b9bf-28bc75ed064d",
+    "rules": "collection://1c5c313b-4736-4f43-abde-9188fc161f22",
+    "revit_ifc_mapping_sets": "collection://7a5b1b9f-453d-4f7d-9bd7-cccd3f1d93df"
+  },
+  "retrieval_policy": {
+    "consultative_catalog": "notion",
+    "executable_snapshots": "git",
+    "allowed_status": ["Aprovado"],
+    "require_official_source": true,
+    "require_version": true,
+    "fallback": "report_unavailable_and_stop",
+    "store_conversations": false,
+    "store_project_files": false,
+    "store_validation_results": false,
+    "store_personal_data": false
+  }
+}

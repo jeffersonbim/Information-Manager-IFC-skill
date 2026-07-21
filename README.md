@@ -10,6 +10,16 @@ Skill modular para gestão da informação BIM, organizada em cinco conhecimento
 
 O arquivo `SKILL.md` funciona como roteador. O conteúdo técnico fica em `references/`, evitando carregar conhecimento que não seja necessário à tarefa.
 
+O hub privado [OpenBIM Knowledge RAG](https://app.notion.com/p/3a4be9ae75ad810b9c17cad02da8db3d) é o catálogo consultivo único dos agentes. Ele contém somente fontes, conceitos e regras técnicas aprovadas; não recebe modelos de projeto, conversas ou resultados. Em cada máquina, configure o MCP oficial do Notion e conclua o OAuth localmente.
+
+```powershell
+openclaw mcp add notion --url https://mcp.notion.com/mcp --transport streamable-http --auth oauth --include notion-search,notion-fetch,notion-get-self
+openclaw mcp login notion
+openclaw mcp doctor notion --probe
+```
+
+Use uma instância/processo OpenClaw dedicado ao recuperador e configure nele somente o MCP Notion. O `bundle-mcp` agrega servidores disponíveis; portanto, adicionar MCPs alheios ao mesmo processo quebra o isolamento pretendido. A conta/integração Notion deve ter acesso exclusivo ao hub OpenBIM.
+
 Todo arquivo passa primeiro pelo ingresso local determinístico, antes de qualquer LLM. O processo nunca devolve valores encontrados e cria uma cópia liberada com nome opaco baseado no hash. Depois, o agente `privacy-gate`, sem ferramentas, valida o manifesto. Somente `ALLOW` libera o fluxo IFC; `REVIEW` e `BLOCK` exigem minimização ou decisão humana documentada.
 
 ```powershell
@@ -21,6 +31,7 @@ python scripts/privacy_ingest.py "C:\origem\modelo.ifc" --cleared-root data/inpu
 - [Fluxo conceitual dos agentes IFC](docs/FLUXO-CONCEITUAL-AGENTES-IFC.html): mostra IDM, fontes, roteamento, validação, consolidação e decisão humana.
 - [Arquitetura OpenClaw dos agentes IFC](docs/ARQUITETURA-OPENCLAW-AGENTES-IFC.html): apresenta camadas, agentes instalados, ferramentas determinísticas e segurança operacional.
 - [Manual para criação de regras de mapeamento IFC](docs/MANUAL-CRIACAO-REGRAS-MAPEAMENTO-IFC.docx): orienta a criação da matriz categoria, classe IFC e `PredefinedType`.
+- [Manual de RAG Revit→IFC e OpenClaw em VPS](docs/MANUAL-RAG-REVIT-IFC-OPENCLAW-VPS.md): descreve governança no Notion, embeddings controlados, relações determinísticas, segurança e implantação em VPS.
 
 ## Validação de mapeamento IFC
 
@@ -45,7 +56,7 @@ python scripts/parameter_mappings.py stats
 python scripts/parameter_mappings.py query CasingDepth --scope type
 ```
 
-O mapeamento regional IFC-SG/Singapura não está incluído nem é carregado pelo parser. Consulte `references/parameter-mappings.md` para proveniência, hashes e limites de interpretação.
+O mapeamento regional IFC-SG/Singapura não está incluído nem é carregado pelo parser. O Notion cataloga os quatro conjuntos, seus hashes e sua autorização de embeddings; as 10.378 linhas permanecem em snapshots Git consultados pelo parser. Consulte `references/parameter-mappings.md` para proveniência e limites.
 
 ## Consulta bSDD
 

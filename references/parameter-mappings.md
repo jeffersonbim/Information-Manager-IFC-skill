@@ -23,6 +23,8 @@ Filtros disponíveis:
 
 O resultado JSON fornece `source_file` e `source_line`. Registrar ambos na evidência.
 
+O catálogo Notion `Conjuntos de Mapeamentos Revit IFC` controla aprovação, hash e autorização de embeddings. Antes de usar uma relação na decisão, exigir conjunto `Aprovado`, conferir o SHA-256 e manter o escopo `instance` ou `type`.
+
 ## Fontes autorizadas
 
 | Fonte | Uso | SHA-256 |
@@ -53,6 +55,8 @@ Aplicar esta ordem:
    - tipo de dado incompatível;
    - não verificável com as evidências disponíveis.
 5. Consultar schema IFC, IDS ou bSDD quando a conclusão exigir significado normativo.
+
+O encadeamento de evidência deve ser: `categoria Revit → parâmetro/export setting → candidato de classe/Pset/propriedade → schema IFC aplicável → requisito IDS/IDM → resultado exportado`. Uma correspondência do TXT gera candidato; somente regra executável e inspeção do IFC produzem aprovação ou falha.
 
 Não concluir que um parâmetro é obrigatório apenas porque aparece nesta base. Não generalizar o arquivo COBie para IFC4/IFC4.3. Não tratar correspondência textual como equivalência semântica confirmada.
 
