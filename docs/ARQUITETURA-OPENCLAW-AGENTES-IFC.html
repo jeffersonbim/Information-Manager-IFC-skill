@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Arquitetura operacional OpenClaw da skill Information Manager IFC.">
+  <title>Arquitetura OpenClaw — Agentes IFC</title>
+  <style>
+    :root {
+      --ink:#eef8f6; --muted:#91aaa7; --night:#071311; --panel:#0c1e1b; --panel-2:#102724;
+      --line:#29443f; --cyan:#55e6cf; --amber:#ffb84d; --red:#ff766d; --blue:#73a7ff;
+      --human:#f5d36f; --radius:18px; --max:1240px;
+      --mono:"Cascadia Code","SFMono-Regular",Consolas,monospace; --sans:Inter,Aptos,"Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;color:var(--ink);background:radial-gradient(circle at 82% 7%,rgba(85,230,207,.13),transparent 24rem),linear-gradient(rgba(85,230,207,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(85,230,207,.035) 1px,transparent 1px),var(--night);background-size:auto,32px 32px,32px 32px,auto;font-family:var(--sans);line-height:1.55}
+    a{color:inherit}.skip{position:absolute;left:-9999px}.skip:focus{left:1rem;top:1rem;z-index:10;background:var(--cyan);color:#04100e;padding:.7rem 1rem}.shell{width:min(calc(100% - 2rem),var(--max));margin-inline:auto}
+    .topbar{position:sticky;top:0;z-index:9;border-bottom:1px solid rgba(85,230,207,.18);background:rgba(7,19,17,.86);backdrop-filter:blur(14px)}
+    .topbar .shell{min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:1rem}.brand{display:flex;align-items:center;gap:.7rem;font:700 .78rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}.pulse{width:10px;aspect-ratio:1;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 6px rgba(85,230,207,.1),0 0 24px var(--cyan)}nav{display:flex;gap:1rem;color:var(--muted);font-size:.82rem}nav a{text-decoration:none}nav a:hover,nav a:focus-visible{color:var(--cyan)}
+    header{min-height:72vh;display:grid;align-items:center;padding:7rem 0 5rem}.eyebrow{color:var(--cyan);font:700 .76rem/1 var(--mono);letter-spacing:.18em;text-transform:uppercase}h1{max-width:1000px;margin:1rem 0 1.4rem;font-size:clamp(3rem,8.2vw,7rem);line-height:.91;letter-spacing:-.065em}h1 em{display:block;color:transparent;-webkit-text-stroke:1px var(--cyan);font-style:normal}.lead{max-width:800px;color:#bfd0cd;font-size:clamp(1.05rem,2vw,1.35rem)}.hero-meta{display:flex;flex-wrap:wrap;gap:.65rem;margin-top:2rem}.chip{border:1px solid var(--line);border-radius:999px;padding:.55rem .85rem;color:var(--muted);font:.73rem/1 var(--mono)}.chip strong{color:var(--ink)}
+    section{padding:5rem 0;scroll-margin-top:65px}.section-head{display:grid;grid-template-columns:minmax(210px,.7fr) 1.7fr;gap:3rem;margin-bottom:2.5rem}h2{margin:0;font-size:clamp(2rem,5vw,4.4rem);line-height:.98;letter-spacing:-.045em}.section-head p{max-width:700px;margin:.3rem 0 0;color:var(--muted);font-size:1.05rem}
+    .architecture{border:1px solid var(--line);border-radius:28px;overflow:hidden;background:rgba(5,16,14,.9);box-shadow:0 30px 80px rgba(0,0,0,.24)}.arch-row{display:grid;grid-template-columns:175px 1fr;min-width:980px;border-bottom:1px solid var(--line)}.arch-row:last-child{border-bottom:0}.arch-label{display:flex;align-items:center;padding:1.3rem;border-right:1px solid var(--line);color:var(--muted);font:700 .7rem/1.35 var(--mono);letter-spacing:.09em;text-transform:uppercase}.arch-content{display:flex;gap:.8rem;padding:1.2rem}.block{position:relative;flex:1;padding:1rem;border:1px solid var(--line);border-radius:12px;background:var(--panel);min-width:120px}.block b{display:block;color:var(--ink);font-size:.88rem}.block span{display:block;margin-top:.25rem;color:var(--muted);font-size:.77rem}.block.source{border-color:rgba(115,167,255,.5)}.block.reason{border-color:rgba(85,230,207,.52)}.block.proof{border-color:rgba(255,184,77,.48)}.block.human{border-color:rgba(245,211,111,.7)}
+    .system-flow{display:grid;grid-template-columns:repeat(6,1fr);gap:0;overflow-x:auto}.flow-step{position:relative;min-width:165px;min-height:205px;padding:1.4rem 1rem;border:1px solid var(--line);background:rgba(12,30,27,.86)}.flow-step+.flow-step{border-left:0}.flow-step::after{content:"→";position:absolute;z-index:2;right:-13px;top:38px;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--cyan);color:var(--night);font:700 1rem var(--mono)}.flow-step:last-child::after{display:none}.flow-step small{color:var(--cyan);font:700 .7rem var(--mono);letter-spacing:.1em}.flow-step h3{margin:.8rem 0 .5rem;font-size:1rem}.flow-step p{margin:0;color:var(--muted);font-size:.8rem}
+    .agent-stack{border-top:1px solid var(--line)}.agent{display:grid;grid-template-columns:64px minmax(190px,.7fr) 1.7fr minmax(180px,.75fr);gap:1.5rem;align-items:start;padding:2rem 0;border-bottom:1px solid var(--line)}.index{color:var(--cyan);font:700 1rem var(--mono)}.agent h3{margin:0;font-size:1.2rem}.agent .role{margin-top:.35rem;color:var(--muted);font:.72rem var(--mono);text-transform:uppercase;letter-spacing:.08em}.agent p{margin:0;color:#bed0cd}.output{padding-left:1rem;border-left:2px solid var(--amber)}.output b{display:block;margin-bottom:.35rem;color:var(--amber);font:.7rem var(--mono);text-transform:uppercase;letter-spacing:.1em}.output span{color:var(--muted);font-size:.84rem}
+    .rules{display:grid;grid-template-columns:repeat(3,1fr);border-block:1px solid var(--line)}.rule{padding:2rem}.rule+.rule{border-left:1px solid var(--line)}.rule b{display:block;margin-bottom:.6rem;color:var(--cyan);font:700 .75rem var(--mono);text-transform:uppercase;letter-spacing:.1em}.rule p{margin:0;color:var(--muted)}
+    .security{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}.security article{padding:1.5rem;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(135deg,rgba(16,39,36,.94),rgba(7,19,17,.8))}.security h3{margin-top:0}.security p,.security li{color:var(--muted)}
+    pre{margin:0;overflow:auto;padding:1.5rem;border:1px solid var(--line);border-radius:var(--radius);background:#06100f;color:#c7dad7;font:13px/1.6 var(--mono)}code{font-family:var(--mono);color:var(--amber)}
+    table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{padding:.9rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--cyan);font:700 .72rem var(--mono);text-transform:uppercase;letter-spacing:.08em}td{color:#bed0cd}td:first-child{color:var(--ink);font-weight:650}
+    .future{padding:2rem;border:1px solid rgba(115,167,255,.4);border-radius:var(--radius);background:rgba(115,167,255,.055)}.future h3{margin-top:0}.future p{color:var(--muted)}
+    footer{padding:3rem 0 4rem;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}footer .shell{display:flex;justify-content:space-between;gap:2rem}
+    @media(max-width:860px){nav{display:none}header{min-height:auto}.section-head,.security{grid-template-columns:1fr}.architecture{overflow-x:auto}.rules{grid-template-columns:1fr}.rule+.rule{border-left:0;border-top:1px solid var(--line)}.agent{grid-template-columns:42px 1fr}.agent>p,.agent .output{grid-column:2}}
+    @media(max-width:520px){h1{font-size:3.25rem}section{padding:3.5rem 0}footer .shell{display:block}}
+    @media(prefers-reduced-motion:no-preference){.pulse{animation:breathe 2.3s ease-in-out infinite}header>.shell{animation:enter .75s ease-out both}@keyframes breathe{50%{box-shadow:0 0 0 10px rgba(85,230,207,.04),0 0 34px var(--cyan)}}@keyframes enter{from{opacity:0;transform:translateY(18px)}}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+  <div class="topbar"><div class="shell"><div class="brand"><span class="pulse" aria-hidden="true"></span> Célula IFC / OpenClaw</div><nav aria-label="Navegação"><a href="#camadas">Camadas</a><a href="#agentes">Agentes</a><a href="#seguranca">Segurança</a><a href="#futuro">Futuro</a></nav></div></div>
+  <header><div class="shell"><div class="eyebrow">Arquitetura operacional · Information Manager IFC</div><h1>OpenClaw por dentro. <em>openBIM de ponta a ponta.</em></h1><p class="lead">A arquitetura separa fontes de decisão, raciocínio dos agentes e provas determinísticas. O IDM orienta o objetivo; o OpenClaw coordena; as ferramentas verificam; Jefferson aprova.</p><div class="hero-meta"><span class="chip"><strong>1</strong> Coordenador IFC</span><span class="chip"><strong>8</strong> especialistas</span><span class="chip"><strong>Docker</strong> isolado</span><span class="chip"><strong>Rede</strong> somente bSDD</span></div></div></header>
+
+  <main id="conteudo">
+    <section id="camadas"><div class="shell"><div class="section-head"><h2>Camadas da arquitetura</h2><p>Uma fonte não vira automaticamente uma conclusão. Cada camada recebe um artefato claro, aplica sua responsabilidade e preserva a origem da informação.</p></div>
+      <div class="architecture" role="region" aria-label="Camadas da arquitetura OpenClaw IFC" tabindex="0">
+        <div class="arch-row"><div class="arch-label">01 · Governança</div><div class="arch-content"><div class="block source"><b>IDM</b><span>Caso de uso, atores, requisitos de troca e gates.</span></div><div class="block source"><b>ISO 19650</b><span>Gestão, estados, responsabilidade e aprovação.</span></div><div class="block source"><b>Decisão humana</b><span>Critérios aprovados e autoridade de publicação.</span></div></div></div>
+        <div class="arch-row"><div class="arch-label">02 · Especificação</div><div class="arch-content"><div class="block source"><b>IDS</b><span>Requisitos computáveis.</span></div><div class="block source"><b>Matriz IFC</b><span>Categoria, classe e PredefinedType.</span></div><div class="block source"><b>bSDD</b><span>Conceitos e URIs oficiais.</span></div></div></div>
+        <div class="arch-row"><div class="arch-label">03 · Orquestração</div><div class="arch-content"><div class="block reason"><b>Coordenador IFC</b><span>Normaliza o pedido, exige inventário, roteia especialistas e controla cobertura.</span></div></div></div>
+        <div class="arch-row"><div class="arch-label">04 · Especialistas</div><div class="arch-content"><div class="block reason"><b>Inventário</b><span>Baseline.</span></div><div class="block reason"><b>Classes</b><span>Conteúdo.</span></div><div class="block reason"><b>Mapeamento</b><span>Intenção × IFC.</span></div><div class="block reason"><b>Relações</b><span>Estrutura.</span></div><div class="block reason"><b>IDS</b><span>Requisitos.</span></div><div class="block reason"><b>bSDD</b><span>Semântica.</span></div></div></div>
+        <div class="arch-row"><div class="arch-label">05 · Prova</div><div class="arch-content"><div class="block proof"><b>IfcOpenShell 0.8.5</b><span>Leitura do IFC e reconciliação por GlobalId.</span></div><div class="block proof"><b>IfcTester</b><span>Execução IDS com cobertura.</span></div><div class="block proof"><b>Scripts da skill</b><span>Mapeamentos, bSDD e validação reproduzível.</span></div></div></div>
+        <div class="arch-row"><div class="arch-label">06 · Controle</div><div class="arch-content"><div class="block human"><b>IFC Consolidator</b><span>Deduplica, cruza, mede cobertura e declara limitações.</span></div><div class="block human"><b>Jefferson</b><span>Aprova, solicita correção, rejeita ou autoriza entrega.</span></div><div class="block human"><b>BCF Coordinator</b><span>Prepara issues somente depois da aprovação.</span></div></div></div>
+      </div>
+    </div></section>
+
+    <section><div class="shell"><div class="section-head"><h2>Sequência operacional</h2><p>O fluxo começa pelo propósito do intercâmbio, não pelo arquivo. O inventário vem antes dos especialistas e a publicação vem depois do gate humano.</p></div><div class="system-flow">
+      <article class="flow-step"><small>A.01</small><h3>IDM e pedido</h3><p>Identificar caso de uso, requisitos e critério de decisão.</p></article>
+      <article class="flow-step"><small>A.02</small><h3>Plano</h3><p>Coordenador define arquivos, agentes, ferramentas e contrato de saída.</p></article>
+      <article class="flow-step"><small>A.03</small><h3>Inventário</h3><p>Schema, unidades, classes e população formam o baseline.</p></article>
+      <article class="flow-step"><small>A.04</small><h3>Execução</h3><p>Especialistas trabalham seletivamente, com tarefas autocontidas.</p></article>
+      <article class="flow-step"><small>A.05</small><h3>Consolidação</h3><p>Evidências, cobertura, conflitos e limitações são reunidos.</p></article>
+      <article class="flow-step"><small>A.06</small><h3>Decisão</h3><p>Jefferson autoriza correção, entrega, IDS ou BCF.</p></article>
+    </div></div></section>
+
+    <section id="agentes"><div class="shell"><div class="section-head"><h2>Agentes instalados</h2><p>São especialidades fixas. Classes como IfcWall e IfcDoor viram lotes temporários do Class Worker, evitando um agente permanente por classe.</p></div><div class="agent-stack">
+      <article class="agent"><div class="index">00</div><div><h3>Coordenador IFC</h3><div class="role">ifc-orchestrator / main</div></div><p>Interpreta o pedido, consulta o IDM aplicável, exige inventário, delega tarefas e encaminha a consolidação.</p><div class="output"><b>Limite</b><span>Não substitui ferramentas nem declara conformidade.</span></div></article>
+      <article class="agent"><div class="index">01</div><div><h3>IFC Inventory</h3><div class="role">ifc-inventory</div></div><p>Identifica schema, unidades, origem, estrutura espacial, classes e populações.</p><div class="output"><b>Entrega</b><span>Baseline técnico mensurável.</span></div></article>
+      <article class="agent"><div class="index">02</div><div><h3>IFC Class Worker</h3><div class="role">ifc-class-worker</div></div><p>Analisa classes ou lotes: tipo, atributos, Psets, Qsets, materiais, parâmetros e GUIDs.</p><div class="output"><b>Entrega</b><span>Cobertura e evidência por classe.</span></div></article>
+      <article class="agent"><div class="index">03</div><div><h3>IFC Relations</h3><div class="role">ifc-relations</div></div><p>Verifica contenção, agregação, tipos, sistemas, zonas, conectividade e vínculos entre classes.</p><div class="output"><b>Entrega</b><span>Órfãos e relações incoerentes.</span></div></article>
+      <article class="agent"><div class="index">04</div><div><h3>IDS Validator</h3><div class="role">ids-validator</div></div><p>Executa requisitos aprovados, mede a população aplicável e distingue falha, N/A e não verificado.</p><div class="output"><b>Guardrail</b><span>Nunca trata 0/0 como sucesso automático.</span></div></article>
+      <article class="agent"><div class="index">05</div><div><h3>bSDD Researcher</h3><div class="role">bsdd-researcher</div></div><p>Consulta conceitos, propriedades e URIs oficiais com proveniência e versão.</p><div class="output"><b>Exceção</b><span>Único especialista com rede liberada.</span></div></article>
+      <article class="agent"><div class="index">06</div><div><h3>BCF Coordinator</h3><div class="role">bcf-coordinator</div></div><p>Transforma achados aprovados em propostas de issues rastreáveis.</p><div class="output"><b>Guardrail</b><span>Não publica sem autorização.</span></div></article>
+      <article class="agent"><div class="index">07</div><div><h3>IFC Consolidator</h3><div class="role">ifc-consolidator</div></div><p>Valida contratos, elimina duplicidades, preserva divergências e calcula cobertura.</p><div class="output"><b>Entrega</b><span>Pacote único para decisão humana.</span></div></article>
+      <article class="agent"><div class="index">08</div><div><h3>IFC Mapping Validator</h3><div class="role">ifc-mapping-validator</div></div><p>Compara categoria, Export As e PredefinedType autorais com a classe e o tipo efetivamente exportados.</p><div class="output"><b>Prova</b><span>CSV + matriz IDM + IFC + GlobalId.</span></div></article>
+    </div></div></section>
+
+    <section aria-label="Princípios"><div class="rules"><div class="rule"><b>Determinístico primeiro</b><p>Scripts, schema e parser produzem fatos antes da interpretação do modelo de linguagem.</p></div><div class="rule"><b>Menor privilégio</b><p>Workers não escrevem, não criam filhos e não enviam mensagens externas.</p></div><div class="rule"><b>Humano no gate</b><p>Alteração, declaração formal e publicação exigem autorização explícita.</p></div></div></section>
+
+    <section id="seguranca"><div class="shell"><div class="section-head"><h2>Segurança operacional</h2><p>O ambiente foi desenhado para analisar cópias controladas, preservando arquivos originais e limitando a superfície de cada especialista.</p></div><div class="security">
+      <article><h3>Sandbox Docker</h3><ul><li>Imagem <code>openclaw-sandbox:bookworm-slim</code>.</li><li>IfcOpenShell 0.8.5 fixado.</li><li>Root filesystem somente leitura.</li><li>Capabilities removidas.</li><li>Rede desativada por padrão.</li></ul></article>
+      <article><h3>Dados e delegação</h3><ul><li><code>/dados-ifc</code> montado somente leitura.</li><li>Profundidade de subagentes igual a 1.</li><li>No máximo cinco filhos simultâneos.</li><li>Agentes recebem tarefas autocontidas.</li><li>Workers não alteram IFC ou matriz.</li></ul></article>
+    </div></div></section>
+
+    <section><div class="shell"><div class="section-head"><h2>Contrato comum</h2><p>Todas as especialidades retornam a mesma forma lógica, facilitando consolidação, auditoria e tratamento de falhas.</p></div><pre>{
+  "status": "success | warning | error",
+  "specialist": "nome-do-agente",
+  "summary": "resultado em uma frase",
+  "findings": [],
+  "evidence": [],
+  "artifacts": [],
+  "limitations": [],
+  "next_actions": [],
+  "requires_human_approval": false
+}</pre></div></section>
+
+    <section><div class="shell"><div class="section-head"><h2>Cobertura obrigatória</h2><p>Sem denominador não existe declaração confiável. Cada relatório informa o que foi analisado e o que permaneceu fora do alcance.</p></div><div style="overflow-x:auto"><table><thead><tr><th>Indicador</th><th>Cálculo</th><th>Responsável</th></tr></thead><tbody><tr><td>Classes</td><td>classes analisadas / classes encontradas</td><td>Inventory + Consolidator</td></tr><tr><td>Entidades</td><td>entidades analisadas / entidades elegíveis</td><td>Class Worker</td></tr><tr><td>Mapeamento</td><td>elementos reconciliados / elementos autorais</td><td>Mapping Validator</td></tr><tr><td>IDS</td><td>regras executadas / regras previstas</td><td>IDS Validator</td></tr><tr><td>Relações</td><td>relações verificadas / relações aplicáveis</td><td>IFC Relations</td></tr></tbody></table></div></div></section>
+
+    <section id="futuro"><div class="shell"><div class="section-head"><h2>Evolução sem misturar papéis</h2><p>A arquitetura atual funciona sem Notion e sem n8n. Integrações futuras entram como camadas externas, preservando o núcleo de análise.</p></div><div class="future"><h3>Notion como fonte de RAG</h3><p>Poderá armazenar conhecimento versionado — schema IFC, formato IDS, regras IDM, matrizes aprovadas e referências bSDD. Não armazenará resultados de análises neste desenho. Um indexador externo transforma páginas aprovadas em trechos com embeddings e metadados; o RAG recupera conhecimento, mas não substitui parser ou validação.</p></div><div class="future" style="margin-top:1rem"><h3>n8n como automação opcional</h3><p>Se adotado depois, ficará fora do OpenClaw: gatilhos, cópias de arquivos, notificações e aprovações. Não é requisito para o fluxo atual e não decide classes IFC.</p></div></div></section>
+  </main>
+  <footer><div class="shell"><span>Arquitetura da skill Information Manager IFC</span><span>OpenClaw · IDM · IFC · IDS · bSDD · BCF</span></div></footer>
+</body>
+</html>

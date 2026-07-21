@@ -10,6 +10,26 @@ Skill modular para gestão da informação BIM, organizada em cinco conhecimento
 
 O arquivo `SKILL.md` funciona como roteador. O conteúdo técnico fica em `references/`, evitando carregar conhecimento que não seja necessário à tarefa.
 
+## Documentação visual e manual
+
+- [Fluxo conceitual dos agentes IFC](docs/FLUXO-CONCEITUAL-AGENTES-IFC.html): mostra IDM, fontes, roteamento, validação, consolidação e decisão humana.
+- [Arquitetura OpenClaw dos agentes IFC](docs/ARQUITETURA-OPENCLAW-AGENTES-IFC.html): apresenta camadas, agentes instalados, ferramentas determinísticas e segurança operacional.
+- [Manual para criação de regras de mapeamento IFC](docs/MANUAL-CRIACAO-REGRAS-MAPEAMENTO-IFC.docx): orienta a criação da matriz categoria, classe IFC e `PredefinedType`.
+
+## Validação de mapeamento IFC
+
+O agente `ifc-mapping-validator` executa auditorias pré e pós-exportação. Ele compara o CSV autoral com uma matriz aprovada pelo projeto/IDM e, quando houver IFC e `GlobalId` comum, confirma a classe e o `PredefinedType` efetivamente exportados.
+
+```powershell
+python scripts/ifc_mapping_validator.py `
+  --source-csv modelo-autoral.csv `
+  --rules regras-projeto.json `
+  --ifc modelo-exportado.ifc `
+  --output resultado.json
+```
+
+Templates: `references/ifc-mapping-source-template.csv` e `references/ifc-mapping-rules.template.json`.
+
 ## Mapeamentos Revit/IFC e COBie
 
 A skill inclui quatro fontes autorizadas e um parser determinístico para consultar nomes, GUIDs, tipos de dados e escopo de instância/tipo:

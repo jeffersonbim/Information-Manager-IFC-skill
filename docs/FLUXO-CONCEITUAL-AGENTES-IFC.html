@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Fluxo conceitual da equipe de agentes IFC no OpenClaw, com responsabilidades, evidências e revisão humana.">
+  <title>Fluxo conceitual — Agentes IFC</title>
+  <style>
+    :root {
+      --ink: #eef8f6;
+      --muted: #91aaa7;
+      --night: #071311;
+      --panel: #0c1e1b;
+      --panel-2: #102724;
+      --line: #29443f;
+      --cyan: #55e6cf;
+      --amber: #ffb84d;
+      --red: #ff766d;
+      --blue: #73a7ff;
+      --human: #f5d36f;
+      --radius: 18px;
+      --max: 1240px;
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      --sans: Inter, Aptos, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 82% 7%, rgba(85,230,207,.13), transparent 24rem),
+        linear-gradient(rgba(85,230,207,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(85,230,207,.035) 1px, transparent 1px),
+        var(--night);
+      background-size: auto, 32px 32px, 32px 32px, auto;
+      font-family: var(--sans);
+      line-height: 1.55;
+    }
+
+    a { color: inherit; }
+    .skip { position: absolute; left: -9999px; }
+    .skip:focus { left: 1rem; top: 1rem; z-index: 10; background: var(--cyan); color: #04100e; padding: .7rem 1rem; }
+    .shell { width: min(calc(100% - 2rem), var(--max)); margin-inline: auto; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 9;
+      border-bottom: 1px solid rgba(85,230,207,.18);
+      background: rgba(7,19,17,.86); backdrop-filter: blur(14px);
+    }
+    .topbar .shell { min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { display: flex; align-items: center; gap: .7rem; font: 700 .78rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    .pulse { width: 10px; aspect-ratio: 1; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 0 6px rgba(85,230,207,.1), 0 0 24px var(--cyan); }
+    nav { display: flex; gap: 1rem; color: var(--muted); font-size: .82rem; }
+    nav a { text-decoration: none; }
+    nav a:hover, nav a:focus-visible { color: var(--cyan); }
+
+    header { min-height: 76vh; display: grid; align-items: center; padding: 7rem 0 5rem; }
+    .eyebrow { color: var(--cyan); font: 700 .76rem/1 var(--mono); letter-spacing: .18em; text-transform: uppercase; }
+    h1 { max-width: 970px; margin: 1rem 0 1.4rem; font-size: clamp(3rem, 8.4vw, 7rem); line-height: .91; letter-spacing: -.065em; }
+    h1 em { display: block; color: transparent; -webkit-text-stroke: 1px var(--cyan); font-style: normal; }
+    .lead { max-width: 760px; color: #bfd0cd; font-size: clamp(1.05rem, 2vw, 1.35rem); }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 2rem; }
+    .chip { border: 1px solid var(--line); border-radius: 999px; padding: .55rem .85rem; color: var(--muted); font: .73rem/1 var(--mono); }
+    .chip strong { color: var(--ink); }
+
+    section { padding: 5rem 0; scroll-margin-top: 65px; }
+    .section-head { display: grid; grid-template-columns: minmax(210px, .7fr) 1.7fr; gap: 3rem; margin-bottom: 2.5rem; }
+    h2 { margin: 0; font-size: clamp(2rem, 5vw, 4.4rem); line-height: .98; letter-spacing: -.045em; }
+    .section-head p { max-width: 680px; margin: .3rem 0 0; color: var(--muted); font-size: 1.05rem; }
+
+    .flow-board { overflow: hidden; border: 1px solid var(--line); border-radius: 28px; background: rgba(8,25,22,.86); box-shadow: 0 30px 80px rgba(0,0,0,.24); }
+    .flow-label { padding: 1rem 1.4rem; border-bottom: 1px solid var(--line); color: var(--muted); font: .72rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+    .flow { display: grid; grid-template-columns: repeat(8, minmax(130px, 1fr)); align-items: stretch; min-width: 1100px; padding: 2rem; }
+    .stage { position: relative; padding: 1rem .8rem; text-align: center; }
+    .stage:not(:last-child)::after { content: ""; position: absolute; top: 44px; left: calc(50% + 39px); width: calc(100% - 58px); height: 2px; background: linear-gradient(90deg, var(--cyan), rgba(85,230,207,.18)); }
+    .stage:not(:last-child)::before { content: "›"; position: absolute; z-index: 2; top: 29px; right: -4px; color: var(--cyan); font: 28px var(--mono); }
+    .node { position: relative; z-index: 3; display: grid; place-items: center; width: 62px; height: 62px; margin: 0 auto 1rem; border: 1px solid var(--cyan); border-radius: 50%; background: var(--night); color: var(--cyan); font: 700 .72rem var(--mono); box-shadow: 0 0 30px rgba(85,230,207,.09); }
+    .stage:nth-child(7) .node { border-radius: 12px; transform: rotate(45deg); border-color: var(--human); color: var(--human); }
+    .stage:nth-child(7) .node span { transform: rotate(-45deg); }
+    .stage h3 { margin: 0 0 .45rem; font-size: .94rem; }
+    .stage p { margin: 0; color: var(--muted); font-size: .78rem; }
+    .parallel { margin: 0 2rem 2rem; padding: 1rem 1.2rem; border-left: 3px solid var(--blue); background: rgba(115,167,255,.07); color: #b9cdf0; font-size: .88rem; }
+
+    .info-map { border: 1px solid var(--line); border-radius: 28px; overflow: hidden; background: rgba(5,16,14,.9); }
+    .map-row { display: grid; grid-template-columns: 150px 1fr; min-width: 920px; border-bottom: 1px solid var(--line); }
+    .map-row:last-child { border-bottom: 0; }
+    .lane-name { display: flex; align-items: center; padding: 1.2rem; border-right: 1px solid var(--line); color: var(--muted); font: 700 .7rem/1.35 var(--mono); letter-spacing: .09em; text-transform: uppercase; }
+    .lane { display: flex; align-items: center; gap: 0; padding: 1.15rem 1.4rem; }
+    .datum { position: relative; flex: 1; min-width: 120px; padding: .85rem .9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: #c7d8d5; font-size: .78rem; }
+    .datum b { display: block; margin-bottom: .25rem; color: var(--ink); font-size: .82rem; }
+    .datum.source { border-color: rgba(115,167,255,.55); }
+    .datum.proof { border-color: rgba(85,230,207,.52); }
+    .datum.hold { border-color: rgba(245,211,111,.6); }
+    .arrow { flex: 0 0 46px; text-align: center; color: var(--cyan); font: 1.4rem var(--mono); }
+    .fanout { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; width: 100%; }
+    .fanout .datum { min-width: 0; }
+    .return-line { color: var(--amber); }
+    .map-legend { display: flex; flex-wrap: wrap; gap: 1rem; padding: 1rem 1.4rem; border-top: 1px solid var(--line); color: var(--muted); font: .7rem var(--mono); }
+    .legend-dot { display: inline-block; width: 8px; height: 8px; margin-right: .35rem; border-radius: 50%; background: var(--blue); }
+    .legend-dot.proof { background: var(--cyan); }
+    .legend-dot.human { background: var(--human); }
+
+    .validation-rail { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; overflow-x: auto; padding: 1px; }
+    .vstep { position: relative; min-width: 150px; min-height: 220px; padding: 1.35rem 1rem; border: 1px solid var(--line); background: rgba(12,30,27,.86); }
+    .vstep + .vstep { border-left: 0; }
+    .vstep::after { content: "→"; position: absolute; z-index: 2; right: -13px; top: 44px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--cyan); color: var(--night); font: 700 1rem var(--mono); }
+    .vstep:last-child::after { display: none; }
+    .vnum { color: var(--cyan); font: 700 .7rem var(--mono); letter-spacing: .12em; }
+    .vstep h3 { margin: .8rem 0 .55rem; font-size: 1rem; }
+    .vstep p { margin: 0; color: var(--muted); font-size: .8rem; }
+    .vstep small { display: block; margin-top: 1rem; color: var(--amber); font: .68rem/1.4 var(--mono); }
+    .truth-table { margin-top: 1.2rem; padding: 1.5rem; border: 1px solid rgba(255,184,77,.35); border-radius: var(--radius); background: rgba(255,184,77,.045); }
+    .truth-table h3 { margin-top: 0; }
+    .truth-table p { margin-bottom: 0; color: var(--muted); }
+
+    .rule-strip { display: grid; grid-template-columns: repeat(3, 1fr); border-block: 1px solid var(--line); }
+    .rule { padding: 2rem; }
+    .rule + .rule { border-left: 1px solid var(--line); }
+    .rule b { display: block; margin-bottom: .6rem; color: var(--cyan); font: 700 .75rem var(--mono); text-transform: uppercase; letter-spacing: .1em; }
+    .rule p { margin: 0; color: var(--muted); }
+
+    .agent-stack { border-top: 1px solid var(--line); }
+    .agent {
+      display: grid; grid-template-columns: 64px minmax(190px, .7fr) 1.7fr minmax(180px, .75fr);
+      gap: 1.5rem; align-items: start; padding: 2rem 0; border-bottom: 1px solid var(--line);
+    }
+    .index { color: var(--cyan); font: 700 1rem var(--mono); }
+    .agent h3 { margin: 0; font-size: 1.25rem; }
+    .agent .role { margin-top: .35rem; color: var(--muted); font: .72rem var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+    .agent p { margin: 0; color: #bed0cd; }
+    .output { padding-left: 1rem; border-left: 2px solid var(--amber); }
+    .output b { display: block; margin-bottom: .35rem; color: var(--amber); font: .7rem var(--mono); text-transform: uppercase; letter-spacing: .1em; }
+    .output span { color: var(--muted); font-size: .86rem; }
+
+    .layers { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .layer { position: relative; min-height: 180px; padding: 1.5rem; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(135deg, rgba(16,39,36,.94), rgba(7,19,17,.8)); }
+    .layer::after { content: attr(data-code); position: absolute; right: 1rem; top: .8rem; color: rgba(85,230,207,.28); font: 700 .75rem var(--mono); }
+    .layer h3 { margin: 0 0 .65rem; }
+    .layer p { margin: 0; color: var(--muted); }
+    .layer ul { padding-left: 1.1rem; margin-bottom: 0; color: #bed0cd; }
+
+    .decision { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center; }
+    .decision article { padding: 1.7rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+    .decision h3 { margin-top: 0; }
+    .decision p { color: var(--muted); }
+    .diamond { display: grid; place-items: center; width: 128px; height: 128px; transform: rotate(45deg); border: 2px solid var(--human); background: var(--night); box-shadow: 0 0 50px rgba(245,211,111,.1); }
+    .diamond span { transform: rotate(-45deg); text-align: center; color: var(--human); font: 700 .74rem/1.35 var(--mono); text-transform: uppercase; }
+    .no { border-top: 3px solid var(--red) !important; }
+    .yes { border-top: 3px solid var(--cyan) !important; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th, td { padding: .9rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--cyan); font: 700 .72rem var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+    td { color: #bed0cd; }
+    td:first-child { color: var(--ink); font-weight: 650; }
+
+    .prompt { position: relative; overflow: hidden; padding: 2rem; border: 1px solid rgba(85,230,207,.35); border-radius: var(--radius); background: #06100f; font-family: var(--mono); color: #c7dad7; }
+    .prompt::before { content: "EXEMPLO DE COMANDO"; display: block; margin-bottom: 1rem; color: var(--cyan); font-size: .7rem; letter-spacing: .14em; }
+    .prompt strong { color: var(--amber); }
+
+    footer { padding: 3rem 0 4rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+    footer .shell { display: flex; justify-content: space-between; gap: 2rem; }
+
+    @media (max-width: 860px) {
+      nav { display: none; }
+      header { min-height: auto; }
+      .section-head, .layers, .decision { grid-template-columns: 1fr; }
+      .flow-board { overflow-x: auto; }
+      .rule-strip { grid-template-columns: 1fr; }
+      .rule + .rule { border-left: 0; border-top: 1px solid var(--line); }
+      .agent { grid-template-columns: 42px 1fr; }
+      .agent > p, .agent .output { grid-column: 2; }
+      .diamond { margin: 1.4rem auto; }
+    }
+
+    @media (max-width: 520px) {
+      h1 { font-size: 3.25rem; }
+      section { padding: 3.5rem 0; }
+      .agent { gap: 1rem; }
+      footer .shell { display: block; }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .pulse { animation: breathe 2.3s ease-in-out infinite; }
+      header > .shell { animation: enter .75s ease-out both; }
+      @keyframes breathe { 50% { box-shadow: 0 0 0 10px rgba(85,230,207,.04), 0 0 34px var(--cyan); } }
+      @keyframes enter { from { opacity: 0; transform: translateY(18px); } }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+  <div class="topbar">
+    <div class="shell">
+      <div class="brand"><span class="pulse" aria-hidden="true"></span> Célula IFC / OpenClaw</div>
+      <nav aria-label="Navegação da página">
+        <a href="#fluxo">Fluxo</a><a href="#informacao">Informação</a><a href="#validacao">Validação</a><a href="#agentes">Agentes</a><a href="#conhecimento">Conhecimento</a><a href="#controle">Controle</a>
+      </nav>
+    </div>
+  </div>
+
+  <header>
+    <div class="shell">
+      <div class="eyebrow">Arquitetura conceitual · versão de consulta</div>
+      <h1>Uma equipe para <em>entender o IFC.</em></h1>
+      <p class="lead">O Coordenador não tenta fazer tudo. Ele organiza a análise, chama somente os especialistas necessários, exige evidências técnicas e entrega uma conclusão consolidada para decisão humana.</p>
+      <div class="hero-meta">
+        <span class="chip"><strong>1</strong> orquestrador</span>
+        <span class="chip"><strong>8</strong> especialistas</span>
+        <span class="chip"><strong>1</strong> aprovação humana obrigatória</span>
+        <span class="chip">Referência: <strong>ISO 19650 + IFC + IDS + bSDD + BCF</strong></span>
+      </div>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <section id="fluxo">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Fluxo de ponta a ponta</h2>
+          <p>A ordem protege a qualidade: primeiro conhecer o arquivo, depois investigar, então consolidar. Nenhuma publicação ou alteração ocorre sem autorização de Jefferson.</p>
+        </div>
+        <div class="flow-board" role="region" aria-label="Fluxo conceitual dos agentes" tabindex="0">
+          <div class="flow-label">Pedido → evidência → decisão</div>
+          <div class="flow">
+            <article class="stage"><div class="node">01</div><h3>Solicitação</h3><p>Objetivo, arquivo e requisito.</p></article>
+            <article class="stage"><div class="node">02</div><h3>IDM</h3><p>Caso de uso, atores, trocas e gates.</p></article>
+            <article class="stage"><div class="node">03</div><h3>Triagem</h3><p>Escopo, segurança e fontes.</p></article>
+            <article class="stage"><div class="node">04</div><h3>Inventário</h3><p>Baseline obrigatório do IFC.</p></article>
+            <article class="stage"><div class="node">05</div><h3>Especialistas</h3><p>Análises seletivas e paralelas.</p></article>
+            <article class="stage"><div class="node">06</div><h3>Consolidação</h3><p>Cobertura, conflitos e síntese.</p></article>
+            <article class="stage"><div class="node"><span>07</span></div><h3>Revisão humana</h3><p>Aprovar, pedir correção ou rejeitar.</p></article>
+            <article class="stage"><div class="node">08</div><h3>Entrega</h3><p>Relatório, IDS ou BCF autorizado.</p></article>
+          </div>
+          <div class="parallel"><strong>Paralelismo com controle.</strong> Relações, classes, IDS e bSDD podem trabalhar ao mesmo tempo depois do inventário. O Coordenador só abre frentes que respondem ao pedido.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="informacao">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Fluxo da informação validado</h2>
+          <p>Este desenho acompanha a informação — não apenas os agentes. Cada transição cria um artefato verificável, preservando a origem do dado até a entrega.</p>
+        </div>
+        <div class="info-map" role="region" aria-label="Desenho do fluxo da informação IFC" tabindex="0">
+          <div class="map-row">
+            <div class="lane-name">01 · Fontes controladas</div>
+            <div class="lane">
+              <div class="datum source"><b>Pedido humano</b>Objetivo, escopo, entrega e restrições.</div><span class="arrow">→</span>
+              <div class="datum source"><b>IDM aplicável</b>Caso de uso, atores, atividades, requisitos de troca e gates.</div><span class="arrow">→</span>
+              <div class="datum source"><b>Pacote openBIM</b>IFC + IDS + documentos + base incorporada da skill.</div>
+            </div>
+          </div>
+          <div class="map-row">
+            <div class="lane-name">02 · Coordenador IFC</div>
+            <div class="lane">
+              <div class="datum"><b>Pacote de decisão IDM</b>Finalidade, etapa, responsável, destinatário e requisitos classificados.</div><span class="arrow">→</span>
+              <div class="datum"><b>Manifesto de arquivos</b>Nome, versão, localização e condição de somente leitura.</div><span class="arrow">→</span>
+              <div class="datum"><b>Plano de roteamento</b>Especialistas, lotes, dependências e saída esperada.</div>
+            </div>
+          </div>
+          <div class="map-row">
+            <div class="lane-name">03 · Baseline obrigatório</div>
+            <div class="lane">
+              <div class="datum proof"><b>IFC Inventory</b>Schema, unidades, origem, classes e quantidades.</div><span class="arrow">→</span>
+              <div class="datum proof"><b>Inventário versionado</b>População real que define o denominador das verificações.</div><span class="arrow">→</span>
+              <div class="datum"><b>Escopo confirmado</b>O Coordenador ajusta tarefas ao conteúdo encontrado.</div>
+            </div>
+          </div>
+          <div class="map-row">
+            <div class="lane-name">04 · Análise especializada</div>
+            <div class="lane">
+              <div class="fanout" style="grid-template-columns:repeat(5,1fr)">
+                <div class="datum proof"><b>Classes</b>Atributos, Psets, parâmetros, tipos e GUIDs.</div>
+                <div class="datum proof"><b>Mapeamento</b>Categoria, Export As, classe e PredefinedType.</div>
+                <div class="datum proof"><b>Relações</b>Hierarquia, contenção, sistemas e órfãos.</div>
+                <div class="datum proof"><b>IDS</b>Aprovado, reprovado, N/A e não verificado.</div>
+                <div class="datum proof"><b>bSDD</b>Conceitos, propriedades e URIs oficiais.</div>
+              </div>
+            </div>
+          </div>
+          <div class="map-row">
+            <div class="lane-name">05 · Pacote de evidências</div>
+            <div class="lane">
+              <div class="datum proof"><b>Resultados estruturados</b>Métrica + objeto + GUID + fonte + método.</div><span class="arrow">→</span>
+              <div class="datum proof"><b>Classificação</b>Fato, inferência, recomendação ou limitação.</div><span class="arrow">→</span>
+              <div class="datum proof"><b>Cobertura declarada</b>Analisado / total e itens não verificáveis.</div>
+            </div>
+          </div>
+          <div class="map-row">
+            <div class="lane-name">06 · Consolidação</div>
+            <div class="lane">
+              <div class="datum"><b>IFC Consolidator</b>Deduplica, cruza achados e identifica conflitos.</div><span class="arrow">→</span>
+              <div class="datum"><b>Controle de qualidade</b>Confere cobertura, rastreabilidade e lacunas.</div><span class="arrow return-line" aria-label="pode retornar">↶</span>
+              <div class="datum"><b>Retorno seletivo</b>Lacunas voltam somente ao especialista responsável.</div>
+            </div>
+          </div>
+          <div class="map-row">
+            <div class="lane-name">07 · Decisão humana</div>
+            <div class="lane">
+              <div class="datum hold"><b>Pacote para Jefferson</b>Resumo + evidências + limitações + recomendação.</div><span class="arrow">→</span>
+              <div class="datum hold"><b>Gate de aprovação</b>Aprovar, corrigir, rejeitar ou reduzir o escopo.</div><span class="arrow">→</span>
+              <div class="datum hold"><b>Registro da decisão</b>Autorização explícita e destino permitido.</div>
+            </div>
+          </div>
+          <div class="map-row">
+            <div class="lane-name">08 · Saídas autorizadas</div>
+            <div class="lane">
+              <div class="fanout">
+                <div class="datum"><b>Relatório</b>Análise técnica consolidada.</div>
+                <div class="datum"><b>IDS</b>Requisito revisado ou proposto.</div>
+                <div class="datum"><b>BCF</b>Issues acionáveis aprovadas.</div>
+                <div class="datum"><b>Nova rodada</b>Correções retornam como entrada versionada.</div>
+              </div>
+            </div>
+          </div>
+          <div class="map-legend">
+            <span><i class="legend-dot"></i>fonte ou referência</span>
+            <span><i class="legend-dot proof"></i>evidência verificável</span>
+            <span><i class="legend-dot human"></i>informação sob controle humano</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="validacao">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Auditoria pré e pós-exportação</h2>
+          <p>O agente <strong>IFC Mapping Validator</strong> compara a intenção no modelo autoral com o resultado efetivamente gravado no IFC. A matriz vem do IDM e do padrão aprovado do projeto — nunca de uma suposição do agente.</p>
+        </div>
+        <div class="validation-rail" role="region" aria-label="Fluxo de validação de mapeamento IFC" tabindex="0">
+          <article class="vstep"><span class="vnum">V.01</span><h3>IDM e caso de uso</h3><p>Define para que a troca serve e quais categorias precisam de mapeamento explícito.</p><small>ENTRADA HUMANA APROVADA</small></article>
+          <article class="vstep"><span class="vnum">V.02</span><h3>Matriz de regras</h3><p>Relaciona categoria, família e tipo às classes e PredefinedTypes permitidos por schema.</p><small>JSON VERSIONADO</small></article>
+          <article class="vstep"><span class="vnum">V.03</span><h3>CSV autoral</h3><p>Exporta ElementId, GlobalId, categoria, família, tipo, Export As e PredefinedType.</p><small>PROVA DA INTENÇÃO</small></article>
+          <article class="vstep"><span class="vnum">V.04</span><h3>Pré-validação</h3><p>Detecta vazio obrigatório, classe não permitida, PredefinedType incoerente e regras ausentes.</p><small>ANTES DE EXPORTAR</small></article>
+          <article class="vstep"><span class="vnum">V.05</span><h3>Exportação IFC</h3><p>Gera a entrega preservando o GlobalId necessário à reconciliação entre origem e resultado.</p><small>ARQUIVO SOMENTE LEITURA</small></article>
+          <article class="vstep"><span class="vnum">V.06</span><h3>Pós-validação</h3><p>Confirma classe real, PredefinedType efetivo no tipo/ocorrência, ObjectType e objetos ausentes.</p><small>IFCOPENSHELL</small></article>
+          <article class="vstep"><span class="vnum">V.07</span><h3>Decisão</h3><p>Consolida cobertura e exceções; Jefferson aprova correção, ressalva ou entrega.</p><small>GATE HUMANO</small></article>
+        </div>
+        <div class="truth-table">
+          <h3>O que pode ser afirmado</h3>
+          <p><strong>Somente IFC:</strong> comprova classe e PredefinedType resultantes, mas não o preenchimento no Revit. <strong>Somente CSV:</strong> comprova a intenção, mas não o resultado exportado. <strong>CSV + IFC + GlobalId:</strong> permite auditoria completa. Campo vazio só é falha quando a matriz exige preenchimento explícito.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="Princípios do fluxo">
+      <div class="rule-strip">
+        <div class="rule"><b>Regra 01 · evidência</b><p>Contagens, GUIDs, propriedades e relações devem vir de parser ou ferramenta verificável, não de suposição do modelo de linguagem.</p></div>
+        <div class="rule"><b>Regra 02 · rastreabilidade</b><p>Cada conclusão indica fonte, método, escopo analisado e limitações. Fato, inferência e recomendação permanecem separados.</p></div>
+        <div class="rule"><b>Regra 03 · autoridade</b><p>Os agentes analisam e recomendam. Jefferson decide o que será corrigido, enviado ou publicado externamente.</p></div>
+      </div>
+    </section>
+
+    <section id="agentes">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Quem faz o quê</h2>
+          <p>Os agentes fixos representam especialidades. Para classes IFC específicas, o Coordenador cria tarefas temporárias por lote, evitando manter dezenas de agentes ociosos.</p>
+        </div>
+        <div class="agent-stack">
+          <article class="agent"><div class="index">00</div><div><h3>Coordenador IFC</h3><div class="role">Orquestrador principal</div></div><p>Entende a pergunta, delimita o escopo, exige o inventário, monta o plano, distribui tarefas, controla dependências e encaminha a síntese para revisão humana. Não inventa resultados dos especialistas.</p><div class="output"><b>Produz</b><span>Plano de análise, pacote de tarefas, critérios de aceite e decisão de encaminhamento.</span></div></article>
+          <article class="agent"><div class="index">01</div><div><h3>IFC Inventory</h3><div class="role">Reconhecimento do modelo</div></div><p>Identifica schema, unidades, aplicações de origem, quantitativos, classes presentes e distribuição espacial. Cria a linha de base que orienta toda a análise seguinte.</p><div class="output"><b>Produz</b><span>Inventário técnico, população por classe, alertas iniciais e escopo mensurável.</span></div></article>
+          <article class="agent"><div class="index">02</div><div><h3>IFC Class Worker</h3><div class="role">Especialista por classe</div></div><p>Inspeciona lotes como IfcWall, IfcDoor ou IfcSpace: atributos, PredefinedType, property sets, parâmetros mapeados, tipos de dados, preenchimento e GUIDs. Novas classes viram tarefas, não novos agentes permanentes.</p><div class="output"><b>Produz</b><span>Diagnóstico por classe, amostras rastreáveis, cobertura e não conformidades de parâmetros.</span></div></article>
+          <article class="agent"><div class="index">03</div><div><h3>IFC Relations</h3><div class="role">Estrutura e conectividade</div></div><p>Verifica decomposição espacial, agregação, contenção, associação a sistemas, materiais, tipos e conexões entre objetos. Encontra incoerências que uma leitura isolada por elemento não revela.</p><div class="output"><b>Produz</b><span>Mapa de relações, órfãos, vínculos ausentes e impactos entre classes.</span></div></article>
+          <article class="agent"><div class="index">04</div><div><h3>IDS Validator</h3><div class="role">Requisitos verificáveis</div></div><p>Compara o IFC com requisitos IDS. Mantém separados aprovado, reprovado, não aplicável e não verificado; uma validação sem objetos aplicáveis nunca é tratada automaticamente como sucesso.</p><div class="output"><b>Produz</b><span>Resultado por requisito, evidências de falha, população testada e lacunas de verificação.</span></div></article>
+          <article class="agent"><div class="index">05</div><div><h3>bSDD Researcher</h3><div class="role">Semântica oficial</div></div><p>Consulta conceitos, propriedades, traduções e identificadores oficiais no buildingSMART Data Dictionary. É o especialista autorizado a pesquisar referências externas quando necessário.</p><div class="output"><b>Produz</b><span>URIs, conceitos candidatos, correspondências semânticas e nível de confiança.</span></div></article>
+          <article class="agent"><div class="index">06</div><div><h3>BCF Coordinator</h3><div class="role">Coordenação de pendências</div></div><p>Transforma achados aprovados em problemas acionáveis: título, evidência, elemento, responsabilidade, prioridade e estado. Prepara o intercâmbio, mas não envia para terceiros sem autorização.</p><div class="output"><b>Produz</b><span>Minuta de issues BCF, lista de responsáveis e trilha de acompanhamento.</span></div></article>
+          <article class="agent"><div class="index">07</div><div><h3>IFC Consolidator</h3><div class="role">Síntese e controle de qualidade</div></div><p>Reúne as saídas, remove duplicidades, verifica cobertura, registra divergências e separa fato, inferência, recomendação e limitação. Devolve lacunas aos especialistas antes da entrega.</p><div class="output"><b>Produz</b><span>Relatório consolidado, resumo executivo, limitações e pacote para decisão humana.</span></div></article>
+          <article class="agent"><div class="index">08</div><div><h3>IFC Mapping Validator</h3><div class="role">Intenção versus exportação</div></div><p>Aplica a matriz aprovada pelo IDM à categoria, família e tipo; audita `Export to IFC As`/`IfcExportAs`; e, depois da exportação, reconcilia pelo GlobalId a classe e o PredefinedType efetivos.</p><div class="output"><b>Produz</b><span>Cobertura pré/pós-exportação e estados conforme, incompleto, incoerente, não exportado, não verificável ou revisão humana.</span></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="conhecimento">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Camadas de conhecimento</h2>
+          <p>A inteligência não fica somente no prompt. Ela combina normas, fontes incorporadas à skill e ferramentas determinísticas para que o resultado seja portátil e auditável.</p>
+        </div>
+        <div class="layers">
+          <article class="layer" data-code="K-01"><h3>Normas e processos</h3><p>ISO 19650, princípios de gestão da informação, requisitos, estados de informação e responsabilidade.</p><ul><li>ISO 19650</li><li>Fluxos de aprovação</li><li>Convenções e rastreabilidade</li></ul></article>
+          <article class="layer" data-code="K-02"><h3>Esquema e semântica</h3><p>IFC, IDS, bSDD e BCF fornecem significado, validação e intercâmbio estruturado.</p><ul><li>Classes, relações e property sets</li><li>Conceitos oficiais e URIs</li><li>Requisitos computáveis</li></ul></article>
+          <article class="layer" data-code="K-03"><h3>Mapeamentos incorporados</h3><p>Os TXT processados alimentam uma base portátil de parâmetros, excluindo a fonte de Singapura conforme decisão do projeto.</p><ul><li>10.378 registros consolidados</li><li>Revit compartilhado + COBie</li><li>Consulta por nome, GUID, tipo e escopo</li></ul></article>
+          <article class="layer" data-code="K-04"><h3>Ferramentas de prova</h3><p>Python, IfcOpenShell e IfcTester executam leituras e verificações reproduzíveis dentro do ambiente controlado.</p><ul><li>Entrada IFC somente leitura</li><li>Sandbox Docker</li><li>Resultados com origem e limitações</li></ul></article>
+          <article class="layer" data-code="K-05"><h3>Notion como RAG futuro</h3><p>Fora da execução atual, poderá indexar somente conhecimento normativo e versionado: schema IFC, formato IDS e regras IDM.</p><ul><li>Não armazenar resultados de análises</li><li>Recuperar trechos com fonte e versão</li><li>Resposta do RAG nunca substitui parser nem matriz aprovada</li></ul></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="controle">
+      <div class="shell">
+        <div class="section-head">
+          <h2>O ponto de controle</h2>
+          <p>A autonomia termina antes da decisão externa. A revisão humana preserva responsabilidade, contexto contratual e julgamento profissional.</p>
+        </div>
+        <div class="decision">
+          <article class="no"><h3>Correção solicitada</h3><p>Jefferson aponta dúvida, inconsistência ou escopo incompleto. O Coordenador reabre apenas as tarefas afetadas e registra a nova rodada.</p></article>
+          <div class="diamond" aria-label="Decisão de Jefferson"><span>Jefferson<br>aprova?</span></div>
+          <article class="yes"><h3>Entrega autorizada</h3><p>O pacote aprovado pode gerar relatório final, especificação IDS, minuta BCF ou outro produto definido no pedido.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="matriz-titulo">
+      <div class="shell">
+        <div class="section-head"><h2 id="matriz-titulo">Matriz de responsabilidade</h2><p>Uma leitura rápida sobre quem executa, quem integra e quem decide em cada momento.</p></div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>Etapa</th><th>Executa</th><th>Coordena</th><th>Aprova</th><th>Evidência mínima</th></tr></thead>
+            <tbody>
+              <tr><td>Definir o escopo</td><td>Coordenador</td><td>Coordenador</td><td>Jefferson</td><td>Objetivo, arquivos, entregável e restrições</td></tr>
+              <tr><td>Inventariar o IFC</td><td>IFC Inventory</td><td>Coordenador</td><td>—</td><td>Schema, unidades, classes e quantitativos</td></tr>
+              <tr><td>Analisar conteúdo</td><td>Especialistas selecionados</td><td>Coordenador</td><td>—</td><td>GUIDs, métricas, fontes e método</td></tr>
+              <tr><td>Consolidar achados</td><td>IFC Consolidator</td><td>Coordenador</td><td>—</td><td>Cobertura, conflitos, limitações e síntese</td></tr>
+              <tr><td>Publicar ou compartilhar</td><td>Agente autorizado</td><td>Coordenador</td><td>Jefferson</td><td>Pacote revisado e autorização explícita</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="Exemplo de uso">
+      <div class="shell">
+        <div class="prompt">Analise o arquivo <strong>modelo.ifc</strong>. Primeiro gere o inventário. Depois verifique paredes, portas e espaços; valide o IDS do projeto; consulte o bSDD somente quando houver dúvida semântica; consolide fatos, inferências, recomendações e limitações. <strong>Não publique nem altere arquivos sem minha autorização.</strong></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell"><span>Arquitetura conceitual da skill Information Manager IFC</span><span>OpenClaw · revisão humana no centro</span></div>
+  </footer>
+</body>
+</html>
