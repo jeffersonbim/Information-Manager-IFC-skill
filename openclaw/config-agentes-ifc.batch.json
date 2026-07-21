@@ -6,7 +6,7 @@
   { "path": "agents.defaults.subagents.requireAgentId", "value": true },
   { "path": "agents.list[0].workspace", "value": "__SKILL_ROOT__/openclaw/workspaces/ifc-orchestrator" },
   { "path": "agents.list[0].tools", "value": { "profile": "minimal", "alsoAllow": ["sessions_spawn", "sessions_yield", "subagents"] } },
-  { "path": "agents.list[0].subagents", "value": { "allowAgents": ["ifc-inventory", "ifc-class-worker", "ifc-mapping-validator", "ifc-relations", "ids-validator", "bsdd-researcher", "bcf-coordinator", "ifc-consolidator"], "requireAgentId": true, "delegationMode": "prefer" } },
+  { "path": "agents.list[0].subagents", "value": { "allowAgents": ["privacy-gate", "ifc-inventory", "ifc-class-worker", "ifc-mapping-validator", "ifc-relations", "ids-validator", "bsdd-researcher", "bcf-coordinator", "ifc-consolidator"], "requireAgentId": true, "delegationMode": "prefer" } },
   { "path": "agents.list[1].tools", "value": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
   { "path": "agents.list[2].tools", "value": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
   { "path": "agents.list[3].tools", "value": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
@@ -17,5 +17,9 @@
   { "path": "agents.list[8].id", "value": "ifc-mapping-validator" },
   { "path": "agents.list[8].workspace", "value": "__SKILL_ROOT__/openclaw/workspaces/ifc-mapping-validator" },
   { "path": "agents.list[8].tools", "value": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+  { "path": "agents.list[9].id", "value": "privacy-gate" },
+  { "path": "agents.list[9].workspace", "value": "__SKILL_ROOT__/openclaw/workspaces/privacy-gate" },
+  { "path": "agents.list[9].tools", "value": { "profile": "minimal", "deny": ["read", "write", "edit", "apply_patch", "exec", "process", "sessions_spawn", "message", "web_search", "web_fetch", "browser"] } },
+  { "path": "agents.list[9].sandbox", "value": { "docker": { "network": "none" } } },
   { "path": "tools.subagents.tools.deny", "value": ["gateway", "cron", "message"] }
 ]

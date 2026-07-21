@@ -27,7 +27,7 @@
         "workspace": "__SKILL_ROOT__/openclaw/workspaces/ifc-orchestrator",
         "tools": { "profile": "minimal", "alsoAllow": ["sessions_spawn", "sessions_yield", "subagents"] },
         "subagents": {
-          "allowAgents": ["ifc-inventory", "ifc-class-worker", "ifc-mapping-validator", "ifc-relations", "ids-validator", "bsdd-researcher", "bcf-coordinator", "ifc-consolidator"],
+          "allowAgents": ["privacy-gate", "ifc-inventory", "ifc-class-worker", "ifc-mapping-validator", "ifc-relations", "ids-validator", "bsdd-researcher", "bcf-coordinator", "ifc-consolidator"],
           "requireAgentId": true,
           "delegationMode": "prefer"
         }
@@ -39,7 +39,8 @@
       { "id": "bsdd-researcher", "workspace": "__SKILL_ROOT__/openclaw/workspaces/bsdd-researcher", "tools": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] }, "sandbox": { "docker": { "network": "bridge" } } },
       { "id": "bcf-coordinator", "workspace": "__SKILL_ROOT__/openclaw/workspaces/bcf-coordinator", "tools": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
       { "id": "ifc-consolidator", "workspace": "__SKILL_ROOT__/openclaw/workspaces/ifc-consolidator", "tools": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
-      { "id": "ifc-mapping-validator", "workspace": "__SKILL_ROOT__/openclaw/workspaces/ifc-mapping-validator", "tools": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } }
+      { "id": "ifc-mapping-validator", "workspace": "__SKILL_ROOT__/openclaw/workspaces/ifc-mapping-validator", "tools": { "profile": "coding", "deny": ["write", "edit", "apply_patch", "sessions_spawn", "message"] } },
+      { "id": "privacy-gate", "workspace": "__SKILL_ROOT__/openclaw/workspaces/privacy-gate", "tools": { "profile": "minimal", "deny": ["read", "write", "edit", "apply_patch", "exec", "process", "sessions_spawn", "message", "web_search", "web_fetch", "browser"] }, "sandbox": { "docker": { "network": "none" } } }
     ]
   },
   "tools": {

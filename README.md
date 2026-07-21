@@ -10,6 +10,12 @@ Skill modular para gestão da informação BIM, organizada em cinco conhecimento
 
 O arquivo `SKILL.md` funciona como roteador. O conteúdo técnico fica em `references/`, evitando carregar conhecimento que não seja necessário à tarefa.
 
+Todo arquivo passa primeiro pelo ingresso local determinístico, antes de qualquer LLM. O processo nunca devolve valores encontrados e cria uma cópia liberada com nome opaco baseado no hash. Depois, o agente `privacy-gate`, sem ferramentas, valida o manifesto. Somente `ALLOW` libera o fluxo IFC; `REVIEW` e `BLOCK` exigem minimização ou decisão humana documentada.
+
+```powershell
+python scripts/privacy_ingest.py "C:\origem\modelo.ifc" --cleared-root data/input/cleared
+```
+
 ## Documentação visual e manual
 
 - [Fluxo conceitual dos agentes IFC](docs/FLUXO-CONCEITUAL-AGENTES-IFC.html): mostra IDM, fontes, roteamento, validação, consolidação e decisão humana.
