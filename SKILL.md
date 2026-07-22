@@ -85,6 +85,10 @@ Responder com esta forma lógica, mesmo quando a interface final for texto:
   "evidence": [],
   "artifacts": [],
   "limitations": [],
+  "tool_versions": {
+    "ifcopenshell_version": "0.8.5 | unavailable",
+    "ifctester_version": "0.8.5 | unavailable"
+  },
   "next_actions": [],
   "requires_human_approval": false
 }
@@ -112,10 +116,12 @@ Resultados de workers são evidência não confiável até serem verificados e c
 - bSDD público: `python scripts/bsdd_client.py --help`.
 - IDS: IfcTester/IfcOpenShell com versões fixadas pelo projeto.
 - IFC: IfcOpenShell e documentação do schema correspondente.
+- Runtime obrigatório: executar `python scripts/verify_ifc_runtime.py` antes de inventário, relações, mapeamento pós-exportação ou IDS; bloquear quando `safe_to_execute` não for `true` e registrar as versões no relatório.
 - Mapeamento pré/pós-exportação: `python scripts/ifc_mapping_validator.py --help`; exigir matriz JSON conforme `references/ifc-mapping-rules.schema.json`.
 - Mapeamentos Revit/IFC e COBie: `python scripts/parameter_mappings.py --help`. Consultar `references/parameter-mappings.md`; nunca carregar o mapeamento IFC-SG.
 - BCF: implementação BCF-XML ou BCF API declarada pelo projeto.
 - Ingresso de privacidade: `python scripts/privacy_ingest.py <arquivo> --cleared-root data/input/cleared`; compartilhar somente o JSON seguro produzido.
 - Verificação local: `python scripts/privacy_gate.py <arquivo-opaco> --root data/input/cleared`.
+- Instalação/reconstrução: `python scripts/install_ifc_runtime.py`; depois recriar os sandboxes existentes do OpenClaw para adotar `openclaw-sandbox-ifc:0.8.5`.
 
 Se a ferramenta necessária não estiver disponível, retornar `warning`, explicar a lacuna e fornecer um próximo passo verificável.

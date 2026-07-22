@@ -1,5 +1,8 @@
 FROM debian:bookworm-slim
 
+LABEL org.opencontainers.image.title="OpenClaw IFC deterministic sandbox" \
+      org.opencontainers.image.version="0.8.5"
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -7,7 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m venv /opt/ifc-venv \
-    && /opt/ifc-venv/bin/pip install --no-cache-dir ifcopenshell==0.8.5
+    && /opt/ifc-venv/bin/pip install --no-cache-dir ifcopenshell==0.8.5 \
+    && /opt/ifc-venv/bin/python -c "import ifcopenshell, ifctester; assert ifcopenshell.version == '0.8.5'"
 
 ENV PATH="/opt/ifc-venv/bin:${PATH}"
 

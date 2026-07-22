@@ -15,6 +15,7 @@
           "scope": "agent",
           "workspaceAccess": "ro",
           "docker": {
+            "image": "openclaw-sandbox-ifc:0.8.5",
             "readOnlyRoot": true,
             "network": "none",
             "capDrop": ["ALL"]
