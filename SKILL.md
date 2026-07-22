@@ -54,6 +54,7 @@ Antes de iniciar o OpenClaw, instalar esta pasta completa como `~/.openclaw/skil
 | OIR, AIR, PIR, requisitos de troca, BEP, TIDP, MIDP, CDE, PIM ou AIM | `references/iso19650.md` |
 | Pesquisar dicionários, classes, propriedades, URIs ou valores permitidos | `references/bsdd.md` |
 | Criar, atribuir, acompanhar ou encerrar issues de coordenação | `references/bcf.md` |
+| Instalar, verificar ou relatar o executor IFC/IDS | `references/ifc-runtime.md` + `scripts/install_ifc_runtime.py` + `scripts/verify_ifc_runtime.py` |
 
 Carregar mais de um conhecimento quando a tarefa atravessar domínios. Exemplos:
 

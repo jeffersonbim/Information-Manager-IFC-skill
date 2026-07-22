@@ -9,7 +9,7 @@ Treat the repository root `SKILL.md` as the canonical procedure and load only th
 
 1. Require `scripts/privacy_ingest.py` and an opaque cleared path before reading a project artifact.
 2. Stop unless both privacy decisions are `ALLOW` and `safe_to_forward` is true.
-3. Run `scripts/verify_ifc_runtime.py`; stop unless `safe_to_execute` is true.
+3. Install once with `python scripts/install_claude_runtime.py`, then run `python scripts/run_ifc_python.py verify_ifc_runtime.py`; stop unless `safe_to_execute` is true.
 4. Delegate from the main coordinator only; specialists cannot spawn other agents.
 5. Use deterministic scripts for findings and the model only for routing, explanation and consolidation.
 6. Include `tool_versions`, evidence, coverage and limitations in every technical report.

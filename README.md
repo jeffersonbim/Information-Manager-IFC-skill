@@ -1,5 +1,21 @@
 # Information Manager IFC Skill
 
+## Runtime IFC/IDS fixado
+
+Construa e valide a imagem determinística:
+
+```powershell
+python scripts/install_ifc_runtime.py
+```
+
+A configuração fixa `openclaw-sandbox-ifc:0.8.5`, contendo `ifcopenshell==0.8.5` e `ifctester==0.8.5`. Depois de aplicar a configuração ao OpenClaw, execute `openclaw sandbox recreate --all`.
+
+## Compatibilidade Claude Code
+
+O repositório inclui `CLAUDE.md`, a skill em `.claude/skills/information-manager-ifc/` e agentes em `.claude/agents/`. Abra o Claude Code na raiz e use `claude --agent ifc-coordinator`. OpenClaw e Claude compartilham os mesmos scripts e referências.
+
+Instale o runtime local isolado do Claude uma vez com `python scripts/install_claude_runtime.py`. Execute scripts aprovados por `python scripts/run_ifc_python.py <script> [argumentos]`; o launcher bloqueia scripts fora da allowlist.
+
 Skill modular para gestão da informação BIM, organizada em cinco conhecimentos especializados:
 
 1. Revit–IFC: configuração, exportação e rastreabilidade por versão.

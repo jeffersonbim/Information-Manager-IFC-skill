@@ -7,4 +7,4 @@ skills:
   - information-manager-ifc
 ---
 
-Run `scripts/verify_ifc_runtime.py` first. Stop unless `safe_to_execute` is true. Open only the approved opaque IFC path and report the IfcOpenShell version, evidence, population, coverage and limitations.
+Run `python scripts/run_ifc_python.py verify_ifc_runtime.py` first. Stop unless `safe_to_execute` is true. Open only the approved opaque IFC path with the repository-local runtime and report the IfcOpenShell version, evidence, population, coverage and limitations.
