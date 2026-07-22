@@ -71,6 +71,17 @@ class IfcRuntimeTests(unittest.TestCase):
         self.assertTrue((ROOT / ".claude" / "agents" / "ifc-coordinator.md").is_file())
         self.assertTrue((ROOT / ".claude" / "agents" / "ifc-inventory.md").is_file())
 
+    def test_installer_reports_missing_docker_without_traceback(self):
+        installer_path = ROOT / "scripts" / "install_ifc_runtime.py"
+        spec = importlib.util.spec_from_file_location("install_ifc_runtime", installer_path)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        result = module.resolve_docker(finder=lambda _: None)
+        self.assertEqual(result["status"], "blocked")
+        self.assertEqual(result["reason_code"], "docker_cli_not_found")
+
 
 if __name__ == "__main__":
     unittest.main()
