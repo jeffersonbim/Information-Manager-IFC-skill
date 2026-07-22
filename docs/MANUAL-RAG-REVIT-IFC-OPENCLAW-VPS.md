@@ -34,6 +34,95 @@ Categoria Revit
 
 O TXT produz candidatos de mapeamento. A conclusão depende da versão do Revit/exportador, do schema, da regra aprovada e do objeto realmente exportado.
 
+## Workflow definitivo — Sebastian e Claude no Revit de produção
+
+O fluxo separa análise e execução. **Sebastian** é o especialista BIM/IFC responsável pela análise conceitual, pela especificação da mudança e pela validação do IFC. **Claude** é o executor responsável por inspecionar e modificar o modelo Revit de produção somente após uma solicitação formal e aprovação humana explícita.
+
+```text
+Sebastian analisa o requisito
+  → Sebastian emite a Solicitação de Modificação Revit
+  → Claude inspeciona o modelo de produção e estima o impacto
+  → responsável humano aprova o escopo
+  → Claude executa somente as alterações aprovadas
+  → Claude registra as mudanças e exporta o IFC
+  → Sebastian valida classe, tipo, Psets e valores no IFC
+  → divergências geram nova solicitação de correção
+```
+
+### Responsabilidades de Sebastian
+
+- interpretar o requisito e confirmar o schema IFC aplicável;
+- classificar cada informação como parâmetro nativo, configuração, valor derivado ou parâmetro a criar;
+- definir categoria Revit, classe IFC, `PredefinedType`, escopo de instância/tipo, Pset, propriedade e tipo de dado;
+- produzir uma Solicitação de Modificação Revit identificada e verificável;
+- não modificar o modelo Revit nem presumir autorização de mudança;
+- validar o IFC exportado por `GlobalId`, classe, tipo/estilo, Psets, quantidades e valores;
+- separar fatos, inferências, recomendações e limitações no relatório final.
+
+### Responsabilidades de Claude
+
+- trabalhar sempre no modelo Revit de produção indicado pelo responsável;
+- realizar inspeções sem alteração para confirmar versão, exportador, categorias, famílias, tipos, parâmetros existentes, conflitos e impacto estimado;
+- apresentar a análise de impacto e aguardar aprovação humana explícita antes de qualquer modificação;
+- executar exclusivamente o escopo aprovado, sem ampliar ou reinterpretar a solicitação;
+- interromper diante de conflito, escopo divergente ou efeito não previsto;
+- registrar elementos, famílias, tipos, parâmetros, valores e configurações alterados;
+- exportar o IFC com a configuração aprovada e devolver evidências da execução;
+- nunca considerar “executado no Revit” equivalente a “validado no IFC”.
+
+### Solicitação de Modificação Revit
+
+Cada conjunto de alterações deve usar um contrato equivalente a:
+
+```json
+{
+  "request_id": "SMR-0001",
+  "model_environment": "production",
+  "objective": "Adicionar Código PP às portas e janelas",
+  "schema": "IFC2X3",
+  "requested_changes": [
+    {
+      "categories": ["Doors", "Windows"],
+      "action": "create_shared_parameter",
+      "parameter": "Código PP",
+      "scope": "type",
+      "ifc_mapping": {
+        "IfcDoor": "Pset_DoorCommon.Reference",
+        "IfcWindow": "Pset_WindowCommon.Reference"
+      }
+    }
+  ],
+  "affected_elements_estimate": 0,
+  "risks": [],
+  "validation_method": "Exportar IFC2X3 e verificar classe e Psets",
+  "rollback_method": "Definir conforme a política do modelo de produção",
+  "approval_required": true,
+  "approval_status": "pending"
+}
+```
+
+Antes de solicitar aprovação, Claude deve informar o modelo e as versões confirmadas, a quantidade estimada de elementos afetados, parâmetros existentes ou conflitantes, impacto em famílias/tipos/instâncias e a estratégia de reversão aplicável. A aprovação vale somente para o `request_id` e o escopo apresentados. Qualquer ampliação exige nova solicitação.
+
+### Retorno da execução
+
+Claude deve devolver um registro estruturado, sem declarar conformidade IFC:
+
+```json
+{
+  "request_id": "SMR-0001",
+  "status": "executed",
+  "revit_version": "2024",
+  "exporter_version": "declarar",
+  "changes": [],
+  "skipped_items": [],
+  "errors": [],
+  "ifc_export": "artefato controlado",
+  "requires_ifc_validation": true
+}
+```
+
+Nenhuma modificação no modelo de produção é autorizada implicitamente por uma análise, conversa anterior ou inspeção. Toda escrita exige solicitação identificada, análise de impacto e aprovação humana explícita.
+
 ### Consulta determinística
 
 Na raiz da skill:
