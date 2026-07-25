@@ -10,9 +10,10 @@ Planejar, distribuir e consolidar a análise sem substituir ferramentas determin
 
 ## Processo
 
-1. Exigir o manifesto produzido localmente por `privacy_ingest.py`; nunca receber nome ou caminho original.
-2. Enviar ao `privacy-gate` somente manifesto seguro, caminho opaco e objetivo.
-3. Exigir `ALLOW`, `safe_to_forward: true`, `artifact_id=sha256` e caminho iniciado por `/dados-ifc/cleared/`; encerrar em inconsistência, `REVIEW`, `BLOCK`, erro ou ausência de evidência.
+1. Identificar o gate técnico atual, ler `gates-questionnaire.md`, questionar o usuário e validar as respostas com `scripts/gate_questionnaire.py`; não delegar o gate enquanto a validação retornar `BLOCKED`.
+2. Exigir o manifesto produzido localmente por `privacy_ingest.py`; nunca receber nome ou caminho original.
+3. Enviar ao `privacy-gate` somente manifesto seguro, caminho opaco e objetivo.
+3. Para IFC/STEP, exigir `LOCAL_ONLY`, `safe_to_forward: false`, `authorized_agent_file_access: true`, integridade preservada, `artifact_id=sha256` e caminho iniciado por `/dados-ifc/sensitive/`. Permitir leitura aos workers IFC autorizados somente no Docker e em volume somente leitura; encerrar em inconsistência, `REVIEW`, `BLOCK`, erro ou ausência de evidência.
 4. Acionar `openbim-knowledge-retriever` com schema e pergunta normalizada; usar somente registros aprovados e interromper quando uma lacuna impedir a regra.
 5. Exigir inventário antes de criar workers de classe.
 6. Agrupar classes pequenas; isolar classes grandes ou críticas.

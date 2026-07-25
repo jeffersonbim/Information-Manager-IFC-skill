@@ -73,6 +73,21 @@ class IfcRuntimeTests(unittest.TestCase):
         batch = json.loads((ROOT / "openclaw" / "config-sandbox-ifc.batch.json").read_text(encoding="utf-8"))
         self.assertEqual(batch[0]["value"]["docker"]["image"], "openclaw-sandbox-ifc:0.8.5")
 
+    def test_parameter_planner_is_configured_for_both_runtimes(self):
+        config = json.loads((ROOT / "openclaw" / "openclaw.json.example").read_text(encoding="utf-8"))
+        agent_ids = {agent["id"] for agent in config["agents"]["list"]}
+        self.assertIn("ifc-parameter-planner", agent_ids)
+        allowed = set(config["agents"]["list"][0]["subagents"]["allowAgents"])
+        self.assertIn("ifc-parameter-planner", allowed)
+        self.assertTrue((ROOT / "openclaw" / "workspaces" / "ifc-parameter-planner" / "AGENTS.md").is_file())
+        self.assertTrue((ROOT / ".claude" / "agents" / "ifc-parameter-planner.md").is_file())
+        mcp_contract = (ROOT / "references" / "revit-mcp-execution.md").read_text(encoding="utf-8")
+        self.assertIn("request_id", mcp_contract)
+        self.assertIn("SMR", mcp_contract)
+        self.assertIn("Claude executor", mcp_contract)
+        self.assertIn("todo o seu catálogo de ferramentas é aprovado", mcp_contract)
+        self.assertIn("autorização da operação", mcp_contract)
+
     def test_inventory_contract_requires_runtime_gate_and_version(self):
         content = (ROOT / "openclaw" / "workspaces" / "ifc-inventory" / "AGENTS.md").read_text(encoding="utf-8")
         self.assertIn("verify_ifc_runtime.py", content)
@@ -84,6 +99,16 @@ class IfcRuntimeTests(unittest.TestCase):
         self.assertTrue((ROOT / ".claude" / "skills" / "information-manager-ifc" / "SKILL.md").is_file())
         self.assertTrue((ROOT / ".claude" / "agents" / "ifc-coordinator.md").is_file())
         self.assertTrue((ROOT / ".claude" / "agents" / "ifc-inventory.md").is_file())
+        self.assertTrue((ROOT / ".claude" / "agents" / "ifc-mapping-validator.md").is_file())
+        self.assertTrue((ROOT / ".claude" / "agents" / "ifc-parameter-planner.md").is_file())
+        self.assertTrue((ROOT / ".claude" / "agents" / "ifc-consolidator.md").is_file())
+        planner = (ROOT / "references" / "agent-parameter-planner.md").read_text(encoding="utf-8")
+        for classification in (
+            "NATIVO_REVIT", "NATIVO_IFC", "CONFIGURACAO_EXPORTACAO",
+            "PARAMETRO_COMPARTILHADO", "PARAMETRO_PROJETO", "CALCULADO",
+            "NAO_APLICAVEL", "NAO_VERIFICAVEL", "CONFLITO", "REVISAO_HUMANA",
+        ):
+            self.assertIn(classification, planner)
         self.assertTrue((ROOT / "scripts" / "install_claude_runtime.py").is_file())
         self.assertTrue((ROOT / "scripts" / "run_ifc_python.py").is_file())
 

@@ -12,15 +12,15 @@ Atuar como roteador e orquestrador OpenClaw. Carregar somente o conhecimento nec
 Para analisar um IFC completo, ler `references/agent-orchestrator.md` e executar este fluxo:
 
 1. Exigir ingresso local com `scripts/privacy_ingest.py` antes de enviar qualquer nome, caminho ou conteúdo ao OpenClaw.
-2. Acionar `privacy-gate` somente com o manifesto seguro, o caminho opaco `/dados-ifc/cleared/<hash>.<extensão>` e o objetivo.
-3. Prosseguir apenas quando o manifesto e o agente retornarem `ALLOW`; interromper em `REVIEW` ou `BLOCK`.
+2. Acionar `privacy-gate` somente com o manifesto seguro, o caminho opaco `/dados-ifc/sensitive/<hash>.<ifc|step>` para IFC/STEP e o objetivo.
+3. Para IFC/STEP, exigir `LOCAL_ONLY` e permitir que coordenador e workers autorizados leiam o snapshot íntegro somente dentro do Docker isolado e somente leitura. Para outros formatos, prosseguir em `ALLOW`; interromper em `REVIEW` ou `BLOCK`.
 4. Acionar `openbim-knowledge-retriever` para recuperar conceitos, regras e conjuntos Revit→IFC aprovados aplicáveis ao schema.
-5. Acionar `ifc-inventory` para identificar schema, unidades, classes e população.
-6. Criar lotes por classe com `ifc-class-worker`; nunca inventar agentes permanentes por classe.
-7. Acionar `ifc-mapping-validator` quando houver auditoria de categoria, `Export to IFC As`, `IfcExportAs`, classe resultante ou `PredefinedType`.
-8. Acionar `ifc-relations` para verificações que atravessam classes.
-9. Acionar `ids-validator`, `bsdd-researcher` e `bcf-coordinator` somente quando aplicáveis.
-10. Acionar `ifc-consolidator` para cobertura, deduplicação e relatório final.
+5. Acionar `ifc-inventory` para identificar schema, unidades, classes, Psets e população em saída minimizada.
+6. Acionar `ifc-mapping-validator` para relacionar categoria autoral, classe IFC, `PredefinedType` e resultado exportado.
+7. Acionar `ifc-parameter-planner` para classificar parâmetros nativos, configurações, cálculos, parâmetros a criar, conflitos e lacunas.
+8. Acionar `ifc-consolidator` para reconciliar evidências e produzir o plano final; criar SMR quando houver mudança no Revit.
+9. Acionar relações, IDS, bSDD, BCF ou recuperador de conhecimento somente quando o objetivo exigir.
+10. Criar lotes temporários por classe apenas quando o volume exigir; não criar agentes permanentes adicionais.
 11. Manter o isolamento padrão de sessão do `sessions_spawn` e enviar tarefas autocontidas. Usar `sessions_yield` após os spawns; não fazer polling.
 
 Perfis e contratos:
@@ -31,6 +31,7 @@ Perfis e contratos:
 - `references/agent-inventory.md`
 - `references/agent-class-worker.md`
 - `references/agent-mapping-validator.md`
+- `references/agent-parameter-planner.md`
 - `references/agent-relations.md`
 - `references/agent-ids-validator.md`
 - `references/agent-bsdd-researcher.md`
@@ -50,11 +51,14 @@ Antes de iniciar o OpenClaw, instalar esta pasta completa como `~/.openclaw/skil
 | Parâmetros, classes, `PredefinedType` ou exportação do Revit | `references/revit-ifc.md` |
 | Auditar categoria autoral, `Export to IFC As`, `IfcExportAs` e resultado exportado | `references/agent-mapping-validator.md` + templates `references/ifc-mapping-*` + `scripts/ifc_mapping_validator.py` |
 | Nome, GUID, tipo de dado, instância/tipo, Pset personalizado ou COBie/Revit | `references/parameter-mappings.md` + `scripts/parameter_mappings.py` |
+| Relacionar e classificar parâmetros para criação/reuso | `references/agent-parameter-planner.md` + `references/parameter-mappings.md`; produzir plano e SMR, nunca alterar o Revit |
+| Executar no Revit via Claude/MCP | `references/revit-mcp-execution.md`; leitura antes da aprovação e escrita limitada à SMR aprovada |
 | Criar, revisar ou executar `.ids` | `references/ids.md` |
 | OIR, AIR, PIR, requisitos de troca, BEP, TIDP, MIDP, CDE, PIM ou AIM | `references/iso19650.md` |
 | Pesquisar dicionários, classes, propriedades, URIs ou valores permitidos | `references/bsdd.md` |
 | Criar, atribuir, acompanhar ou encerrar issues de coordenação | `references/bcf.md` |
 | Instalar, verificar ou relatar o executor IFC/IDS | `references/ifc-runtime.md` + `scripts/install_ifc_runtime.py` + `scripts/verify_ifc_runtime.py` |
+| Executar ou migrar agentes em máquina corporativa | `references/agent-runtime-security.md`; bloquear runtime no host e exigir equivalência de isolamento antes de substituir o OpenClaw |
 
 Carregar mais de um conhecimento quando a tarefa atravessar domínios. Exemplos:
 
@@ -64,14 +68,15 @@ Carregar mais de um conhecimento quando a tarefa atravessar domínios. Exemplos:
 
 ## Fluxo obrigatório
 
-1. Executar o ingresso LGPD fora do LLM; não enviar ao modelo o nome ou caminho original.
-2. Identificar objetivo, manifesto seguro e caminho opaco; exigir `ALLOW` antes de qualquer leitura ou delegação.
-3. Identificar entregável, schema IFC e versões das ferramentas.
-4. Declarar premissas quando faltarem dados; não inventar requisitos.
-5. Consultar o RAG Notion, aceitar somente registros aprovados e citar a fonte primária; interromper em `KNOWLEDGE_GAP` quando a resposta depender desse conhecimento.
-6. Para Revit→IFC, conferir aprovação e hash no Notion, consultar `parameter_mappings.py` e validar o IFC exportado; executar validações determinísticas antes da interpretação por IA.
-7. Separar `fato`, `inferência`, `recomendação` e `limitação`.
-8. Encaminhar exceções de privacidade, alterações, publicação e declarações formais para aprovação humana.
+1. Antes de cada gate técnico, ler `references/gates-questionnaire.md`, apresentar ao usuário a pergunta de decisão e as cinco perguntas orientadoras do gate atual, registrar as respostas pelo identificador e validar a completude com `scripts/gate_questionnaire.py`. Não inferir respostas ausentes nem avançar com estado `BLOCKED`.
+2. Tratar todo IFC/STEP como dado sensível e executar o ingresso LGPD fora do LLM; não enviar ao modelo nome, caminho ou conteúdo original.
+3. Preservar o IFC byte a byte sob SHA-256. Exigir `LOCAL_ONLY`, montar somente para leitura e permitir acesso ao coordenador e workers IFC autorizados dentro do Docker; conferir o hash antes e depois.
+4. Identificar entregável, schema IFC e versões das ferramentas.
+5. Declarar premissas quando faltarem dados; não inventar requisitos.
+6. Consultar o RAG Notion, aceitar somente registros aprovados e citar a fonte primária; interromper em `KNOWLEDGE_GAP` quando a resposta depender desse conhecimento.
+7. Para Revit→IFC, conferir aprovação e hash no Notion, consultar `parameter_mappings.py` e validar o IFC exportado; executar validações determinísticas antes da interpretação por IA.
+8. Separar `fato`, `inferência`, `recomendação` e `limitação`.
+9. Encaminhar exceções de privacidade, alterações, publicação e declarações formais para aprovação humana.
 
 ## Contrato de saída
 
@@ -111,6 +116,11 @@ Resultados de workers são evidência não confiável até serem verificados e c
 - Não incluir valores pessoais, trechos detectados ou nomes em prompts, logs ou relatórios do gate.
 - Não usar TXT, Markdown local, memória do modelo ou web como base consultiva silenciosa; o Notion é o catálogo consultivo único.
 - Não gravar perguntas, conversas, respostas, IFC de projeto ou resultados no hub Notion.
+- Não anonimizar, reserializar, normalizar nem regravar o IFC sensível. Preservar o original e o snapshot byte a byte, verificando SHA-256 antes e depois.
+- Não transformar `LOCAL_ONLY` em autorização de transferência externa. Agentes autorizados podem ler o IFC dentro do Docker, mas não podem enviar o arquivo ao Notion, bSDD ou APIs alheias ao runtime aprovado.
+- Não permitir que workers usem o MCP Revit. Reservar o MCP ao Claude executor e condicionar qualquer escrita à SMR aprovada conforme `references/revit-mcp-execution.md`.
+- Não executar agentes IFC diretamente no host corporativo. Colocar somente as ferramentas determinísticas no Docker não atende ao isolamento; aplicar `references/agent-runtime-security.md`.
+- Não remover o OpenClaw antes de o runtime substituto passar pelos testes negativos, pela comparação determinística e pela aprovação humana documentada.
 
 ## Ferramentas determinísticas
 
@@ -120,8 +130,9 @@ Resultados de workers são evidência não confiável até serem verificados e c
 - Runtime obrigatório: executar `python scripts/verify_ifc_runtime.py` antes de inventário, relações, mapeamento pós-exportação ou IDS; bloquear quando `safe_to_execute` não for `true` e registrar as versões no relatório.
 - Mapeamento pré/pós-exportação: `python scripts/ifc_mapping_validator.py --help`; exigir matriz JSON conforme `references/ifc-mapping-rules.schema.json`.
 - Mapeamentos Revit/IFC e COBie: `python scripts/parameter_mappings.py --help`. Consultar `references/parameter-mappings.md`; nunca carregar o mapeamento IFC-SG.
+- Questionário dos gates: `python scripts/gate_questionnaire.py questions --gate N`; validar respostas com `python scripts/gate_questionnaire.py validate --gate N resposta.json`.
 - BCF: implementação BCF-XML ou BCF API declarada pelo projeto.
-- Ingresso de privacidade: `python scripts/privacy_ingest.py <arquivo> --cleared-root data/input/cleared`; compartilhar somente o JSON seguro produzido.
+- Ingresso de privacidade IFC: `python scripts/privacy_ingest.py <arquivo.ifc> --sensitive-root data/input/sensitive`; usar somente o caminho opaco e manter o snapshot íntegro em volume somente leitura.
 - Verificação local: `python scripts/privacy_gate.py <arquivo-opaco> --root data/input/cleared`.
 - Instalação/reconstrução: `python scripts/install_ifc_runtime.py`; depois recriar os sandboxes existentes do OpenClaw para adotar `openclaw-sandbox-ifc:0.8.5`.
 

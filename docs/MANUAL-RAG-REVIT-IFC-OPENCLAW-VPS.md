@@ -123,6 +123,12 @@ Claude deve devolver um registro estruturado, sem declarar conformidade IFC:
 
 Nenhuma modificação no modelo de produção é autorizada implicitamente por uma análise, conversa anterior ou inspeção. Toda escrita exige solicitação identificada, análise de impacto e aprovação humana explícita.
 
+### Claude e MCP Revit
+
+O MCP é a ponte controlada de execução, não um canal de autonomia dos subagentes. Antes da aprovação da SMR, Claude pode usar somente ferramentas de leitura para confirmar modelo, categorias, famílias, tipos, parâmetros, conflitos e impacto. Depois da aprovação, Claude usa apenas as ferramentas de escrita necessárias ao `request_id`, revisão, modelo e escopo autorizados. Workers de inventário, mapeamento e planejamento de parâmetros não recebem ferramentas MCP do Revit. O retorno do MCP comprova execução; a conformidade depende da validação independente do IFC exportado.
+
+O servidor MCP permanece ativo e todas as suas ferramentas são aprovadas para disponibilidade ao Claude executor. Aprovação da ferramenta não equivale à autorização de uma operação: qualquer chamada que altere, salve, sincronize, exclua, exporte ou execute código deve estar coberta pela SMR e pelos argumentos aprovados. Ao terminar a SMR, encerra-se a autorização transacional, não o servidor MCP.
+
 ### Consulta determinística
 
 Na raiz da skill:

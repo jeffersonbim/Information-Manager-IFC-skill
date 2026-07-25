@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 .ifc-venv/
+data/input/sensitive/
 openclaw/workspaces/**/BOOTSTRAP.md
 openclaw/workspaces/**/HEARTBEAT.md
 openclaw/workspaces/**/IDENTITY.md

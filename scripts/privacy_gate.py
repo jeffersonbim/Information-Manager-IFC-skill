@@ -201,6 +201,12 @@ def decision_for(extension: str, findings: Counter[str], limitations: Iterable[s
     if limitations:
         reasons.extend(limitations)
         return "REVIEW", reasons
+    # IFC/STEP is sensitive by governance policy even when no pattern is detected.
+    # The intact artifact may be parsed only by the isolated deterministic runtime.
+    if extension in {".ifc", ".step"}:
+        reasons.append("ifc_sensitive_by_default")
+        reasons.extend(sorted(findings))
+        return "LOCAL_ONLY", reasons
     if findings:
         reasons.extend(sorted(findings))
         return "BLOCK", reasons
@@ -263,7 +269,7 @@ def scan_file(path: Path, root: Path | None = None) -> dict[str, object]:
     decision, reasons = decision_for(extension, findings, limitations)
     return {
         "status": "success",
-        "policy_version": "lgpd-preflight-1.0",
+        "policy_version": "lgpd-preflight-2.0",
         "decision": decision,
         "sha256": digest.hexdigest(),
         "format": FORMAT_LABELS.get(extension, "unknown"),
@@ -274,6 +280,12 @@ def scan_file(path: Path, root: Path | None = None) -> dict[str, object]:
         ],
         "reason_codes": reasons,
         "safe_to_forward": decision == "ALLOW",
+        "local_deterministic_processing_allowed": decision == "LOCAL_ONLY",
+        "llm_content_access_allowed": decision == "LOCAL_ONLY",
+        "authorized_agent_file_access": decision == "LOCAL_ONLY",
+        "external_file_transfer_allowed": False,
+        "integrity_preserved": True,
+        "data_classification": "sensitive_personal_data" if extension in {".ifc", ".step"} else "preflight_scanned",
         "content_excerpts_returned": False,
         "limitations": limitations,
     }
@@ -302,7 +314,7 @@ def main() -> int:
             "content_excerpts_returned": False,
         }
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    return {"ALLOW": 0, "REVIEW": 2, "BLOCK": 3}.get(str(result.get("decision")), 4)
+    return {"ALLOW": 0, "LOCAL_ONLY": 0, "REVIEW": 2, "BLOCK": 3}.get(str(result.get("decision")), 4)
 
 
 if __name__ == "__main__":

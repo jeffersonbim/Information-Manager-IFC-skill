@@ -68,3 +68,4 @@ Não concluir que um parâmetro é obrigatório apenas porque aparece nesta base
 - `bsdd-researcher`: confirmar semântica e URI quando houver correspondência possível.
 - `bcf-coordinator`: citar evidência de mapeamento ao registrar falha de exportação.
 - `ifc-consolidator`: separar erro de autoria, configuração de exportação e não verificado.
+- `ifc-parameter-planner`: relacionar requisito, parâmetro Revit e destino IFC; classificar a ação conforme `references/agent-parameter-planner.md`.

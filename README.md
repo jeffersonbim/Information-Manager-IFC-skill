@@ -16,6 +16,16 @@ O repositório inclui `CLAUDE.md`, a skill em `.claude/skills/information-manage
 
 Instale o runtime local isolado do Claude uma vez com `python scripts/install_claude_runtime.py`. Execute scripts aprovados por `python scripts/run_ifc_python.py <script> [argumentos]`; o launcher bloqueia scripts fora da allowlist.
 
+Equipe principal: `ifc-coordinator` (Sebastian), `ifc-inventory`, `ifc-mapping-validator`, `ifc-parameter-planner` e `ifc-consolidator`. Os demais especialistas são opcionais e só entram quando o requisito envolver relações complexas, IDS, bSDD, BCF ou conhecimento aprovado no Notion.
+
+O Claude mantém integração com o Revit por MCP como executor separado. Os agentes produzem o plano e a SMR; ferramentas MCP de escrita só são usadas por Claude depois da aprovação explícita e no escopo autorizado. Consulte [Claude e MCP — execução controlada no Revit](references/revit-mcp-execution.md).
+
+O `revit-mcp-server` pode permanecer ativo com todas as suas ferramentas disponíveis e aprovadas para uso pelo Claude executor. Essa aprovação é de capacidade; cada operação que modifique o modelo continua vinculada à SMR correspondente. Os subagentes de análise não recebem o MCP.
+
+### Restrição para máquina corporativa
+
+O runtime local acima é apenas compatibilidade de desenvolvimento e não autoriza agentes no host corporativo. Em ambiente corporativo, o coordenador e os especialistas Claude também devem estar confinados em containers; colocar apenas os scripts IFC no Docker não cria essa fronteira. O OpenClaw permanece autorizado até o substituto demonstrar isolamento e equivalência determinística conforme [Segurança do runtime de agentes](references/agent-runtime-security.md).
+
 Skill modular para gestão da informação BIM, organizada em cinco conhecimentos especializados:
 
 1. Revit–IFC: configuração, exportação e rastreabilidade por versão.
@@ -36,10 +46,10 @@ openclaw mcp doctor notion --probe
 
 Use uma instância/processo OpenClaw dedicado ao recuperador e configure nele somente o MCP Notion. O `bundle-mcp` agrega servidores disponíveis; portanto, adicionar MCPs alheios ao mesmo processo quebra o isolamento pretendido. A conta/integração Notion deve ter acesso exclusivo ao hub OpenBIM.
 
-Todo arquivo passa primeiro pelo ingresso local determinístico, antes de qualquer LLM. O processo nunca devolve valores encontrados e cria uma cópia liberada com nome opaco baseado no hash. Depois, o agente `privacy-gate`, sem ferramentas, valida o manifesto. Somente `ALLOW` libera o fluxo IFC; `REVIEW` e `BLOCK` exigem minimização ou decisão humana documentada.
+Todo arquivo passa primeiro pelo ingresso local determinístico. Todo IFC/STEP é classificado como sensível e recebe `LOCAL_ONLY`: o processo cria um snapshot byte a byte com nome SHA-256, sem anonimizar ou regravar o conteúdo. Coordenador e workers IFC autorizados podem ler o snapshot dentro do Docker, em volume somente leitura. O arquivo não pode ser transferido ao Notion, bSDD ou serviços externos não aprovados. `REVIEW` e `BLOCK` interrompem o fluxo.
 
 ```powershell
-python scripts/privacy_ingest.py "C:\origem\modelo.ifc" --cleared-root data/input/cleared
+python scripts/privacy_ingest.py "C:\origem\modelo.ifc" --sensitive-root data/input/sensitive
 ```
 
 ## Documentação visual e manual

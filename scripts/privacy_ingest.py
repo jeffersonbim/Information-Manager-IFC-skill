@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create a privacy-cleared, content-addressed snapshot before any LLM sees it."""
+"""Create an integrity-preserved, content-addressed sensitive snapshot before any LLM access."""
 
 from __future__ import annotations
 
@@ -32,14 +32,14 @@ def ingest(source: Path, cleared_root: Path) -> dict[str, object]:
             os.fsync(snapshot.fileno())
 
         result = scan_file(temporary_path, cleared_root)
-        if result.get("decision") != "ALLOW":
+        if result.get("decision") not in {"ALLOW", "LOCAL_ONLY"}:
             return result
 
         artifact_id = str(result["sha256"])
         destination = cleared_root / f"{artifact_id}{safe_extension}"
         if destination.exists():
             existing = scan_file(destination, cleared_root)
-            if existing.get("sha256") != artifact_id or existing.get("decision") != "ALLOW":
+            if existing.get("sha256") != artifact_id or existing.get("decision") not in {"ALLOW", "LOCAL_ONLY"}:
                 return {
                     "status": "error",
                     "decision": "BLOCK",
@@ -57,7 +57,8 @@ def ingest(source: Path, cleared_root: Path) -> dict[str, object]:
         manifest = {
             **result,
             "artifact_id": artifact_id,
-            "agent_path": f"/dados-ifc/cleared/{artifact_id}{safe_extension}",
+            "agent_path": f"/dados-ifc/sensitive/{artifact_id}{safe_extension}",
+            "storage_zone": "sensitive" if result.get("decision") == "LOCAL_ONLY" else "cleared",
         }
         manifest_path = cleared_root / f"{artifact_id}.privacy.json"
         manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -77,13 +78,15 @@ def ingest(source: Path, cleared_root: Path) -> dict[str, object]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Copia localmente apenas entradas liberadas pelo preflight LGPD.")
+    parser = argparse.ArgumentParser(description="Cria snapshot local íntegro e classificado pelo preflight LGPD.")
     parser.add_argument("input", type=Path, help="Arquivo original; o nome nunca aparece na saída")
-    parser.add_argument("--cleared-root", type=Path, required=True, help="Diretório local montado como /dados-ifc/cleared")
+    roots = parser.add_mutually_exclusive_group(required=True)
+    roots.add_argument("--sensitive-root", type=Path, help="Diretório local montado como /dados-ifc/sensitive")
+    roots.add_argument("--cleared-root", type=Path, help="Alias legado; para IFC, usar a zona sensitive")
     args = parser.parse_args()
-    result = ingest(args.input, args.cleared_root)
+    result = ingest(args.input, args.sensitive_root or args.cleared_root)
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    return {"ALLOW": 0, "REVIEW": 2, "BLOCK": 3}.get(str(result.get("decision")), 4)
+    return {"ALLOW": 0, "LOCAL_ONLY": 0, "REVIEW": 2, "BLOCK": 3}.get(str(result.get("decision")), 4)
 
 
 if __name__ == "__main__":

@@ -9,13 +9,19 @@ from scripts.privacy_ingest import ingest
 
 
 class PrivacyGateTests(unittest.TestCase):
-    def test_clean_ifc_is_allowed(self):
+    def test_every_ifc_is_local_only(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "model.ifc"
             path.write_bytes(b"ISO-10303-21;\n#1=IFCWALL('abc');\nEND-ISO-10303-21;")
             result = scan_file(path)
-        self.assertEqual("ALLOW", result["decision"])
-        self.assertTrue(result["safe_to_forward"])
+        self.assertEqual("LOCAL_ONLY", result["decision"])
+        self.assertFalse(result["safe_to_forward"])
+        self.assertTrue(result["local_deterministic_processing_allowed"])
+        self.assertTrue(result["llm_content_access_allowed"])
+        self.assertTrue(result["authorized_agent_file_access"])
+        self.assertFalse(result["external_file_transfer_allowed"])
+        self.assertTrue(result["integrity_preserved"])
+        self.assertEqual("sensitive_personal_data", result["data_classification"])
         self.assertNotIn("model.ifc", str(result))
 
     def test_values_are_never_returned(self):
@@ -24,12 +30,12 @@ class PrivacyGateTests(unittest.TestCase):
         self.assertEqual(1, findings["email"])
         self.assertNotIn(secret.decode(), str(findings))
 
-    def test_ifc_person_is_blocked_without_echoing_content(self):
+    def test_ifc_person_is_local_only_without_echoing_content(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "people.ifc"
             path.write_bytes(b"ISO-10303-21;\n#7=IFCPERSON('ID','Silva','Ana',$,$,$,$,$);")
             result = scan_file(path)
-        self.assertEqual("BLOCK", result["decision"])
+        self.assertEqual("LOCAL_ONLY", result["decision"])
         self.assertIn("ifc_person_entity", result["reason_codes"])
         self.assertNotIn("Silva", str(result))
         self.assertNotIn("Ana", str(result))
@@ -128,9 +134,13 @@ class PrivacyGateTests(unittest.TestCase):
             source.write_text("ISO-10303-21;\n#1=IFCWALL('abc');", encoding="ascii")
             result = ingest(source, root / "cleared")
             artifact = root / "cleared" / Path(str(result["agent_path"])).name
-        self.assertEqual("ALLOW", result["decision"])
-        self.assertNotIn("Nome", str(result))
-        self.assertTrue(artifact.name.startswith(str(result["sha256"])))
+            self.assertEqual("LOCAL_ONLY", result["decision"])
+            self.assertNotIn("Nome", str(result))
+            self.assertTrue(artifact.name.startswith(str(result["sha256"])))
+            self.assertEqual(source.read_bytes(), artifact.read_bytes())
+            self.assertTrue(result["integrity_preserved"])
+            self.assertEqual("sensitive", result["storage_zone"])
+            self.assertIn("/dados-ifc/sensitive/", str(result["agent_path"]))
 
 
 if __name__ == "__main__":

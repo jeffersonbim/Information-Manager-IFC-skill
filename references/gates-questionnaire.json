@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "scope": "technical_information_requirements_to_validated_ifc",
+  "gates": [
+    {
+      "gate": 1,
+      "name": "Requisitos",
+      "decision_question": "O requisito está claro, aplicável e verificável?",
+      "questions": [
+        {"id": "G1-Q1", "required": true, "text": "Qual decisão ou uso da informação justifica este requisito?"},
+        {"id": "G1-Q2", "required": true, "text": "A quais objetos, categorias, disciplinas e fases ele se aplica?"},
+        {"id": "G1-Q3", "required": true, "text": "O dado pertence ao tipo ou à ocorrência?"},
+        {"id": "G1-Q4", "required": true, "text": "Datatype, unidade, cardinalidade e valores permitidos estão definidos?"},
+        {"id": "G1-Q5", "required": true, "text": "Uma pessoa independente interpretaria o requisito da mesma forma?"}
+      ]
+    },
+    {
+      "gate": 2,
+      "name": "Origem",
+      "decision_question": "O dado já existe ou precisa ser criado?",
+      "questions": [
+        {"id": "G2-Q1", "required": true, "text": "Existe um parâmetro nativo do Revit que represente o conceito sem ambiguidade?"},
+        {"id": "G2-Q2", "required": true, "text": "O dado pode ser obtido da geometria ou calculado de forma reproduzível?"},
+        {"id": "G2-Q3", "required": true, "text": "Já existe parâmetro compartilhado aprovado, com GUID controlado?"},
+        {"id": "G2-Q4", "required": true, "text": "Existe propriedade IFC padrão ou conceito bSDD compatível?"},
+        {"id": "G2-Q5", "required": true, "text": "Se for necessário criar, a customização está tecnicamente justificada?"}
+      ]
+    },
+    {
+      "gate": 3,
+      "name": "Arquitetura",
+      "decision_question": "A estrutura autoral e o destino IFC estão tecnicamente coerentes?",
+      "questions": [
+        {"id": "G3-Q1", "required": true, "text": "Há uma única fonte autoral controlada para cada informação?"},
+        {"id": "G3-Q2", "required": true, "text": "Categoria, tipo ou ocorrência, datatype e unidade são compatíveis entre Revit e IFC?"},
+        {"id": "G3-Q3", "required": true, "text": "Classe IFC, PredefinedType, Pset e propriedade representam corretamente o conceito?"},
+        {"id": "G3-Q4", "required": true, "text": "O GUID e o método de exportação estão registrados e versionados?"},
+        {"id": "G3-Q5", "required": true, "text": "A solução evita parâmetros ou propriedades duplicadas?"}
+      ]
+    },
+    {
+      "gate": 4,
+      "name": "Exportação",
+      "decision_question": "O IFC real contém a estrutura planejada?",
+      "questions": [
+        {"id": "G4-Q1", "required": true, "text": "Foram exportados casos positivo, negativo e não aplicável?"},
+        {"id": "G4-Q2", "required": true, "text": "Classe, PredefinedType, Pset, propriedade, datatype, unidade e valor chegaram ao IFC?"},
+        {"id": "G4-Q3", "required": true, "text": "Qual é o comportamento do exportador quando o valor está vazio?"},
+        {"id": "G4-Q4", "required": true, "text": "Outra pessoa consegue repetir a exportação e obter o mesmo resultado?"},
+        {"id": "G4-Q5", "required": true, "text": "Toda divergência foi encaminhada ao gate onde sua causa se originou?"}
+      ]
+    },
+    {
+      "gate": 5,
+      "name": "IDS",
+      "decision_question": "A especificação detecta corretamente conformidade e falha?",
+      "questions": [
+        {"id": "G5-Q1", "required": true, "text": "A applicability encontra a população sem depender do dado cuja ausência será testada?"},
+        {"id": "G5-Q2", "required": true, "text": "Requirements, cardinalidades, datatypes e valores refletem o requisito aprovado?"},
+        {"id": "G5-Q3", "required": true, "text": "O IDS passa no XSD e nos casos positivos e falha nos casos negativos?"},
+        {"id": "G5-Q4", "required": true, "text": "Resultados 0/0, skipped ou populações inesperadas são tratados como inconclusivos?"},
+        {"id": "G5-Q5", "required": true, "text": "Existe alguma regra necessária que esteja fora do escopo do IDS?"}
+      ]
+    },
+    {
+      "gate": 6,
+      "name": "Validação",
+      "decision_question": "O modelo atende aos requisitos aplicáveis com cobertura conhecida?",
+      "questions": [
+        {"id": "G6-Q1", "required": true, "text": "O IFC analisado e o IDS utilizado são as versões corretas e estão identificados por hash?"},
+        {"id": "G6-Q2", "required": true, "text": "A população esperada, encontrada e efetivamente avaliada está explícita?"},
+        {"id": "G6-Q3", "required": true, "text": "As falhas obrigatórias indicam requisito, valor encontrado e GlobalId?"},
+        {"id": "G6-Q4", "required": true, "text": "O status final distingue conforme, não conforme e inconclusivo?"},
+        {"id": "G6-Q5", "required": true, "text": "A correção foi direcionada ao gate de origem e o consolidado usa o último modelo analisado?"}
+      ]
+    }
+  ]
+}
