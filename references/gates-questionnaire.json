@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "scope": "technical_information_requirements_to_validated_ifc",
   "gates": [
     {
@@ -22,8 +22,8 @@
         {"id": "G2-Q1", "required": true, "text": "Existe um parâmetro nativo do Revit que represente o conceito sem ambiguidade?"},
         {"id": "G2-Q2", "required": true, "text": "O dado pode ser obtido da geometria ou calculado de forma reproduzível?"},
         {"id": "G2-Q3", "required": true, "text": "Já existe parâmetro compartilhado aprovado, com GUID controlado?"},
-        {"id": "G2-Q4", "required": true, "text": "Existe propriedade IFC padrão ou conceito bSDD compatível?"},
-        {"id": "G2-Q5", "required": true, "text": "Se for necessário criar, a customização está tecnicamente justificada?"}
+        {"id": "G2-Q4", "required": true, "text": "No schema IFC exato, o destino é atributo, quantidade padronizada, Pset oficial, associação ou ainda não está comprovado?"},
+        {"id": "G2-Q5", "required": true, "text": "Se for necessário criar, está justificado como Custom Qto para medição física ou Custom Pset para informação descritiva?"}
       ]
     },
     {
@@ -33,8 +33,8 @@
       "questions": [
         {"id": "G3-Q1", "required": true, "text": "Há uma única fonte autoral controlada para cada informação?"},
         {"id": "G3-Q2", "required": true, "text": "Categoria, tipo ou ocorrência, datatype e unidade são compatíveis entre Revit e IFC?"},
-        {"id": "G3-Q3", "required": true, "text": "Classe IFC, PredefinedType, Pset e propriedade representam corretamente o conceito?"},
-        {"id": "G3-Q4", "required": true, "text": "O GUID e o método de exportação estão registrados e versionados?"},
+        {"id": "G3-Q3", "required": true, "text": "Classe IFC, PredefinedType e Destino_IFC_Tipo representam o conceito sem confundir atributo, Qto, Pset ou associação?"},
+        {"id": "G3-Q4", "required": true, "text": "GUID, método de exportação e, para Qto, QuantitySet, QuantityName, QuantityType e MethodOfMeasurement estão registrados e versionados?"},
         {"id": "G3-Q5", "required": true, "text": "A solução evita parâmetros ou propriedades duplicadas?"}
       ]
     },
@@ -44,7 +44,7 @@
       "decision_question": "O IFC real contém a estrutura planejada?",
       "questions": [
         {"id": "G4-Q1", "required": true, "text": "Foram exportados casos positivo, negativo e não aplicável?"},
-        {"id": "G4-Q2", "required": true, "text": "Classe, PredefinedType, Pset, propriedade, datatype, unidade e valor chegaram ao IFC?"},
+        {"id": "G4-Q2", "required": true, "text": "O IFC comprova classe, PredefinedType e a entidade planejada: atributo, IfcElementQuantity/IfcQuantity*, IfcPropertySet/IfcProperty* ou associação?"},
         {"id": "G4-Q3", "required": true, "text": "Qual é o comportamento do exportador quando o valor está vazio?"},
         {"id": "G4-Q4", "required": true, "text": "Outra pessoa consegue repetir a exportação e obter o mesmo resultado?"},
         {"id": "G4-Q5", "required": true, "text": "Toda divergência foi encaminhada ao gate onde sua causa se originou?"}

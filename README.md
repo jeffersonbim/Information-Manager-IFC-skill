@@ -84,6 +84,24 @@ python scripts/parameter_mappings.py query CasingDepth --scope type
 
 O mapeamento regional IFC-SG/Singapura não está incluído nem é carregado pelo parser. O Notion cataloga os quatro conjuntos, seus hashes e sua autorização de embeddings; as 10.378 linhas permanecem em snapshots Git consultados pelo parser. Consulte `references/parameter-mappings.md` para proveniência e limites.
 
+## Consulta inicial de parâmetros e destinos IFC
+
+Use `templates/Template_Consulta_Parametros_Revit_IFC.xlsx` para registrar a
+entrada do requisito e a saída do planejamento. A saída separa
+`ATTRIBUTE`, `STANDARD_QTO`, `CUSTOM_QTO`, `STANDARD_PSET`, `CUSTOM_PSET`,
+`MATERIAL_ASSOCIATION`, `CALCULATED_ONLY` e `UNVERIFIED`; o campo combinado
+`Pset_ou_Qto` não faz parte do contrato.
+
+Consulte [Destino técnico da informação no IFC](references/ifc-information-destination.md).
+Um `CUSTOM_QTO` só é aprovado no Gate 4 quando o IFC exportado comprova
+`IfcElementQuantity` e o subtipo `IfcQuantity*` esperado.
+
+## Liberação
+
+O primeiro uso deve ocorrer como produção assistida. Os critérios para
+entrada, homologação e versionamento de correções estão em
+[Checklist de produção assistida](references/production-assisted-checklist.md).
+
 ## Consulta bSDD
 
 O cliente `scripts/bsdd_client.py` implementa operações públicas e somente leitura da API oficial, sem dependências externas:

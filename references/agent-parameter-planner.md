@@ -19,11 +19,18 @@ Receber somente o caminho opaco baseado no SHA-256. Abrir o IFC intacto apenas n
 
 1. Confirmar schema, versão do Revit/exportador e nível de ocorrência ou tipo.
 2. Verificar se a informação é atributo nativo da entidade no schema.
-3. Verificar Pset/propriedade oficial aplicável à classe e ao `PredefinedType`.
+3. Verificar, nesta ordem, quantidade padronizada do schema, Pset/propriedade
+   oficial e associação IFC aplicável à classe e ao `PredefinedType`.
 4. Consultar os mapeamentos Revit/IFC aprovados e registrar arquivo, linha, GUID, tipo de dado e escopo encontrados.
 5. Separar configuração de exportação de parâmetro de informação.
 6. Detectar duplicidade, conflito de nome, GUID, tipo de dado, instância/tipo ou categoria.
-7. Classificar a ação e indicar a evidência. Sem evidência suficiente, usar `NAO_VERIFICAVEL` ou `REVISAO_HUMANA`.
+7. Classificar separadamente a origem autoral e o destino IFC. Nunca usar um
+   campo combinado `Pset_ou_Qto`.
+8. Para quantidade customizada, registrar grandeza, unidade, fórmula e método
+   de medição; somente aprovar após o IFC comprovar `IfcElementQuantity` e o
+   subtipo `IfcQuantity*` esperado.
+9. Classificar a ação e indicar a evidência. Sem evidência suficiente, usar
+   `NAO_VERIFICAVEL` ou `REVISAO_HUMANA`.
 
 ## Classificações permitidas
 
@@ -37,6 +44,22 @@ Receber somente o caminho opaco baseado no SHA-256. Abrir o IFC intacto apenas n
 - `NAO_VERIFICAVEL`: evidência insuficiente para classificar.
 - `CONFLITO`: duas definições incompatíveis competem pelo mesmo conceito.
 - `REVISAO_HUMANA`: decisão semântica ou de governança obrigatória.
+
+## Destinos IFC permitidos
+
+- `ATTRIBUTE`: atributo nativo da entidade IFC.
+- `STANDARD_QTO`: quantidade prevista pelo schema e template aplicável.
+- `CUSTOM_QTO`: quantidade física customizada, comprovada no IFC como
+  `IfcElementQuantity` + `IfcQuantity*`.
+- `STANDARD_PSET`: propriedade de Pset oficial do schema.
+- `CUSTOM_PSET`: propriedade descritiva customizada.
+- `MATERIAL_ASSOCIATION`: associação semântica de material IFC.
+- `CALCULATED_ONLY`: resultado calculado que não será exportado.
+- `UNVERIFIED`: destino ainda não comprovado.
+
+Priorizar `ATTRIBUTE`, `STANDARD_QTO`, `STANDARD_PSET` e
+`MATERIAL_ASSOCIATION`. Não duplicar um atributo nativo em Pset customizado sem
+requisito explícito e justificativa aprovada.
 
 ## Saída mínima por parâmetro
 
@@ -56,7 +79,20 @@ Receber somente o caminho opaco baseado no SHA-256. Abrir o IFC intacto apenas n
     "schema": "IFC2X3",
     "classes": ["IfcDoor", "IfcWindow"],
     "predefined_type": null,
-    "mappings": ["Pset_DoorCommon.Reference", "Pset_WindowCommon.Reference"]
+    "destination_type": "STANDARD_PSET",
+    "attribute": null,
+    "quantity_set": null,
+    "quantity_name": null,
+    "quantity_type": null,
+    "method_of_measurement": null,
+    "formula": null,
+    "pset": "Pset_DoorCommon",
+    "property": "Reference",
+    "ifc_data_type": "IfcIdentifier",
+    "material_association": null,
+    "exported_entity_type": "IfcPropertySingleValue",
+    "schema_evidence": [],
+    "export_evidence": []
   },
   "evidence": [],
   "limitations": [],
@@ -69,6 +105,10 @@ Usar `CREATE`, `REUSE`, `MAP`, `CALCULATE`, `REMOVE_DUPLICATE`, `NO_ACTION` ou `
 ## Limites
 
 - Não concluir obrigatoriedade apenas por existir parâmetro ou Pset.
+- Não transportar automaticamente nomes `Qto_*BaseQuantities` entre IFC2X3,
+  IFC4 e IFC4.3. Validar o template no schema exato.
+- Não aprovar `CUSTOM_QTO` quando o exportador tiver produzido
+  `IfcPropertySet`/`IfcPropertySingleValue`.
 - Não confundir material IFC com parâmetro textual de material.
 - Não forçar `PredefinedType` quando não existir ou não for aplicável no schema/nível analisado.
 - Não gerar GUID novo sem política de governança e aprovação.

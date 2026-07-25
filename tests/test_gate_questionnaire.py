@@ -28,6 +28,18 @@ class GateQuestionnaireTests(unittest.TestCase):
             ids.extend(question["id"] for question in gate["questions"])
         self.assertEqual(len(ids), len(set(ids)))
 
+    def test_schema_aware_questions_separate_qto_from_pset(self):
+        payload = json.loads(QUESTIONNAIRE.read_text(encoding="utf-8"))
+        by_id = {
+            question["id"]: question["text"]
+            for gate in payload["gates"]
+            for question in gate["questions"]
+        }
+        self.assertIn("Custom Qto", by_id["G2-Q5"])
+        self.assertIn("Custom Pset", by_id["G2-Q5"])
+        self.assertIn("Destino_IFC_Tipo", by_id["G3-Q3"])
+        self.assertIn("IfcElementQuantity", by_id["G4-Q2"])
+
     def test_missing_answer_blocks_gate(self):
         module = self.load_module()
         questionnaire = module.load_questionnaire()

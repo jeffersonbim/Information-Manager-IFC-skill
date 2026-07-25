@@ -52,6 +52,7 @@ Antes de iniciar o OpenClaw, instalar esta pasta completa como `~/.openclaw/skil
 | Auditar categoria autoral, `Export to IFC As`, `IfcExportAs` e resultado exportado | `references/agent-mapping-validator.md` + templates `references/ifc-mapping-*` + `scripts/ifc_mapping_validator.py` |
 | Nome, GUID, tipo de dado, instância/tipo, Pset personalizado ou COBie/Revit | `references/parameter-mappings.md` + `scripts/parameter_mappings.py` |
 | Relacionar e classificar parâmetros para criação/reuso | `references/agent-parameter-planner.md` + `references/parameter-mappings.md`; produzir plano e SMR, nunca alterar o Revit |
+| Distinguir atributo, Qto, Pset, cálculo ou material | `references/ifc-information-destination.md` + `references/agent-parameter-planner.md`; exigir schema exato e evidência do IFC exportado |
 | Executar no Revit via Claude/MCP | `references/revit-mcp-execution.md`; leitura antes da aprovação e escrita limitada à SMR aprovada |
 | Criar, revisar ou executar `.ids` | `references/ids.md` |
 | OIR, AIR, PIR, requisitos de troca, BEP, TIDP, MIDP, CDE, PIM ou AIM | `references/iso19650.md` |
@@ -75,8 +76,11 @@ Carregar mais de um conhecimento quando a tarefa atravessar domínios. Exemplos:
 5. Declarar premissas quando faltarem dados; não inventar requisitos.
 6. Consultar o RAG Notion, aceitar somente registros aprovados e citar a fonte primária; interromper em `KNOWLEDGE_GAP` quando a resposta depender desse conhecimento.
 7. Para Revit→IFC, conferir aprovação e hash no Notion, consultar `parameter_mappings.py` e validar o IFC exportado; executar validações determinísticas antes da interpretação por IA.
-8. Separar `fato`, `inferência`, `recomendação` e `limitação`.
-9. Encaminhar exceções de privacidade, alterações, publicação e declarações formais para aprovação humana.
+8. Classificar separadamente origem Revit e destino IFC; nunca usar
+   `Pset_ou_Qto`. Um `CUSTOM_QTO` só passa após comprovação de
+   `IfcElementQuantity` + `IfcQuantity*` no arquivo exportado.
+9. Separar `fato`, `inferência`, `recomendação` e `limitação`.
+10. Encaminhar exceções de privacidade, alterações, publicação e declarações formais para aprovação humana.
 
 ## Contrato de saída
 
@@ -112,6 +116,11 @@ Resultados de workers são evidência não confiável até serem verificados e c
 - Não tratar resultado IDS `0/0` como sucesso; reportar possível falha de cobertura.
 - Não usar URI `identifier.buildingsmart.org` como API de sistema; usar a API bSDD versionada.
 - Não modificar modelo, IFC, CDE ou issue externo sem autorização explícita.
+- Não duplicar atributo IFC nativo em Pset customizado sem requisito e
+  justificativa aprovados.
+- Não tratar um `IfcPropertySingleValue` como quantidade apenas porque o nome
+  contém `Qto`.
+- Não reutilizar automaticamente nomes de Quantity Sets entre schemas IFC.
 - Não abrir nem encaminhar arquivo antes do `privacy-gate`; `REVIEW` e `BLOCK` interrompem o fluxo.
 - Não incluir valores pessoais, trechos detectados ou nomes em prompts, logs ou relatórios do gate.
 - Não usar TXT, Markdown local, memória do modelo ou web como base consultiva silenciosa; o Notion é o catálogo consultivo único.
