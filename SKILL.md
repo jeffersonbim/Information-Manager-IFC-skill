@@ -137,6 +137,9 @@ Resultados de workers são evidência não confiável até serem verificados e c
 - IDS: IfcTester/IfcOpenShell com versões fixadas pelo projeto.
 - IFC: IfcOpenShell e documentação do schema correspondente.
 - Runtime obrigatório: executar `python scripts/verify_ifc_runtime.py` antes de inventário, relações, mapeamento pós-exportação ou IDS; bloquear quando `safe_to_execute` não for `true` e registrar as versões no relatório.
+- Aceitação do runtime: executar `scripts/smoke_ifc_ids_runtime.py` dentro da
+  imagem fixada, sem rede e com a skill somente para leitura; exigir um caso
+  positivo, um negativo e cobertura diferente de `0/0`.
 - Mapeamento pré/pós-exportação: `python scripts/ifc_mapping_validator.py --help`; exigir matriz JSON conforme `references/ifc-mapping-rules.schema.json`.
 - Mapeamentos Revit/IFC e COBie: `python scripts/parameter_mappings.py --help`. Consultar `references/parameter-mappings.md`; nunca carregar o mapeamento IFC-SG.
 - Questionário dos gates: `python scripts/gate_questionnaire.py questions --gate N`; validar respostas com `python scripts/gate_questionnaire.py validate --gate N resposta.json`.

@@ -11,6 +11,15 @@ SCRIPT = ROOT / "scripts" / "verify_ifc_runtime.py"
 
 
 class IfcRuntimeTests(unittest.TestCase):
+    def test_runtime_smoke_script_requires_positive_negative_and_nonzero_coverage(self):
+        smoke = ROOT / "scripts" / "smoke_ifc_ids_runtime.py"
+        self.assertTrue(smoke.is_file())
+        content = smoke.read_text(encoding="utf-8")
+        self.assertIn("applicable == 2", content)
+        self.assertIn("passed == 1", content)
+        self.assertIn("failed == 1", content)
+        self.assertIn("coverage_zero_zero", content)
+
     def load_module(self):
         spec = importlib.util.spec_from_file_location("verify_ifc_runtime", SCRIPT)
         self.assertIsNotNone(spec)

@@ -10,6 +10,18 @@ python scripts/install_ifc_runtime.py
 
 A configuração fixa `openclaw-sandbox-ifc:0.8.5`, contendo `ifcopenshell==0.8.5` e `ifctester==0.8.5`. Depois de aplicar a configuração ao OpenClaw, execute `openclaw sandbox recreate --all`.
 
+Valide a execução real de IFC e IDS, sem rede:
+
+```powershell
+docker run --rm --network none `
+  -v "${PWD}:/skill:ro" -w /skill `
+  openclaw-sandbox-ifc:0.8.5 `
+  python scripts/smoke_ifc_ids_runtime.py
+```
+
+O teste cria um IFC temporário dentro do container e exige dois elementos
+aplicáveis: um aprovado e um reprovado. Resultado `0/0` bloqueia a aceitação.
+
 ## Compatibilidade Claude Code
 
 O repositório inclui `CLAUDE.md`, a skill em `.claude/skills/information-manager-ifc/` e agentes em `.claude/agents/`. Abra o Claude Code na raiz e use `claude --agent ifc-coordinator`. OpenClaw e Claude compartilham os mesmos scripts e referências.
