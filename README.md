@@ -108,6 +108,9 @@ Consulte [Destino técnico da informação no IFC](references/ifc-information-de
 Um `CUSTOM_QTO` só é aprovado no Gate 4 quando o IFC exportado comprova
 `IfcElementQuantity` e o subtipo `IfcQuantity*` esperado.
 
+Para definir presença opcional, obrigatória e multiplicidade dos valores,
+consulte o [Guia técnico de cardinalidade em requisitos BIM e IDS](docs/guias/Guia_Cardinalidade_Requisitos_IDS.md).
+
 ## Liberação
 
 O primeiro uso deve ocorrer como produção assistida. Os critérios para
