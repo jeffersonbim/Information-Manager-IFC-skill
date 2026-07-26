@@ -226,3 +226,223 @@ Na coluna `Cardinalidade` da aba `Entrada_Requisitos`:
 Quando a cardinalidade não puder ser determinada, não presumir um valor. Usar
 o estado de revisão e retornar ao Gate 1.
 
+## 12. Código do requisito, nome do campo e destino IFC
+
+`Codigo_Requisito` não é o nome do parâmetro. É o identificador permanente da
+exigência e deve permanecer estável mesmo quando o nome recebido for corrigido,
+normalizado ou mapeado.
+
+Exemplo:
+
+| Campo | Valor |
+|---|---|
+| `Codigo_Requisito` | `ARQ-PORTA-001` |
+| `Nome_Campo_Cliente` | `LarguraBandeira` |
+| `Descricao` | Largura da bandeira superior da porta |
+| `Parametro_Revit_Candidato` | `BIM_LarguraBandeira` |
+| `Origem_Revit_Tipo` | `INEXISTENTE` até criação aprovada |
+| `Categoria_Revit` | `Doors` |
+| `Unidade` | `mm` |
+| `Cardinalidade` | `0..1` |
+
+Devem ser preservados separadamente:
+
+1. **Código do requisito:** chave de rastreabilidade nos seis gates.
+2. **Nome do campo do cliente:** texto exato recebido.
+3. **Parâmetro Revit candidato:** possível origem autoral.
+4. **Destino IFC:** estrutura final aprovada e comprovada.
+
+## 13. Nativo IFC não significa Pset
+
+Um dado nativo IFC não precisa começar com `Pset_`. O schema possui estruturas
+diferentes:
+
+| Destino | Exemplo |
+|---|---|
+| Atributo | `IfcDoor.OverallWidth` |
+| Quantity Set | `Qto_DoorBaseQuantities.Width`, quando aplicável ao schema |
+| Property Set | `Pset_DoorCommon.FireRating` |
+| Associação | `IfcRelAssociatesMaterial` |
+
+A pesquisa deve seguir a prioridade:
+
+1. `ATTRIBUTE`;
+2. `STANDARD_QTO`;
+3. `STANDARD_PSET`;
+4. `MATERIAL_ASSOCIATION`;
+5. `CUSTOM_QTO`;
+6. `CUSTOM_PSET`;
+7. `CALCULATED_ONLY`;
+8. `UNVERIFIED`.
+
+O prefixo `Pset_` identifica um conjunto de propriedades. Ele não representa
+atributos nativos, quantidades ou associações. Um conjunto customizado também
+não deve copiar o nome de um Pset oficial.
+
+## 14. Como registrar um candidato de Qto
+
+Na entrada, registrar separadamente:
+
+- `Destino_IFC_Tipo_Candidato`: `STANDARD_QTO` ou `CUSTOM_QTO`;
+- `QuantitySet_Candidato`;
+- `QuantityName_Candidato`;
+- schema e classe IFC candidatos.
+
+Na saída da análise, completar:
+
+- `QuantityType`;
+- `MethodOfMeasurement`;
+- `Formula_Calculo`;
+- `Datatype_IFC`;
+- `Entidade_Exportada_Comprovada`;
+- `Evidencia_Inspecao_IFC`.
+
+Exemplo para uma área de piso:
+
+| Campo | Valor |
+|---|---|
+| `Codigo_Requisito` | `ARQ-FLOOR-001` |
+| `Nome_Campo_Cliente` | `AreaPiso` |
+| `Parametro_Revit_Candidato` | `Area` |
+| `Origem_Revit_Tipo` | `NATIVO` |
+| `Schema_IFC` | `IFC4.3` |
+| `Classe_IFC_Candidata` | `IfcSlab` |
+| `Destino_IFC_Tipo_Candidato` | `STANDARD_QTO` |
+| `QuantityName_Candidato` | `GrossArea` ou `NetArea`, conforme requisito |
+| `QuantityType` | `IfcQuantityArea` |
+| `Entidade_Exportada_Comprovada` | `IfcElementQuantity > IfcQuantityArea` |
+
+O nome exato do `QuantitySet` deve ser confirmado na versão do schema. Não
+preencher automaticamente um nome de IFC4/IFC4.3 quando a entrega for IFC2X3.
+
+## 15. Exemplos de destinos diferentes
+
+### Largura total da porta
+
+- origem: parâmetro nativo de largura no Revit;
+- destino: `ATTRIBUTE`;
+- atributo: `IfcDoor.OverallWidth`;
+- Qto e Pset permanecem vazios, salvo requisito adicional justificado.
+
+### Resistência ao fogo
+
+- origem: `Fire Rating` no Revit;
+- destino: `STANDARD_PSET`;
+- Pset: `Pset_DoorCommon`;
+- propriedade: `FireRating`.
+
+### Largura da bandeira
+
+- origem: parâmetro compartilhado candidato;
+- destino inicial: `UNVERIFIED`;
+- destino possível: `CUSTOM_QTO` quando for medição contratual ou
+  `CUSTOM_PSET` quando for informação descritiva;
+- aprovação: somente após o Gate 4 comprovar a entidade realmente exportada.
+
+O parâmetro Revit é a origem do dado. Atributo, Qto, Pset e associação são
+destinos IFC diferentes.
+
+## 16. Entendendo Pset e Qto de forma prática
+
+### O que é um Pset
+
+`Pset` significa **Property Set**, ou conjunto de propriedades. Ele organiza
+informações que descrevem uma característica, condição ou classificação do
+objeto.
+
+Exemplos:
+
+- `Pset_DoorCommon.FireRating`: resistência ao fogo da porta;
+- `Pset_DoorCommon.IsExternal`: indica se a porta é externa;
+- `Pset_WallCommon.LoadBearing`: indica se a parede possui função estrutural.
+
+O nome completo possui dois níveis:
+
+```text
+Pset_DoorCommon.FireRating
+└── conjunto         └── propriedade
+```
+
+O Pset não é o parâmetro do Revit. O parâmetro Revit é uma possível fonte do
+valor; o Pset e sua propriedade constituem o destino desse valor no IFC.
+
+### O que é um Qto
+
+`Qto` significa **Quantity Set**, ou conjunto de quantidades. Ele agrupa
+medições do objeto, como comprimento, largura, altura, área, volume, perímetro,
+peso ou contagem.
+
+Exemplos:
+
+- `Qto_SlabBaseQuantities.GrossArea`: área bruta de uma laje;
+- `Qto_WallBaseQuantities.NetVolume`: volume líquido de uma parede;
+- `Qto_DoorBaseQuantities.Width`: largura quantificada de uma porta, quando
+  prevista pelo schema contratado.
+
+O nome também possui dois níveis:
+
+```text
+Qto_SlabBaseQuantities.GrossArea
+└── conjunto de quantidades └── quantidade
+```
+
+Uma quantidade IFC possui ainda um tipo técnico, como `IfcQuantityLength`,
+`IfcQuantityArea`, `IfcQuantityVolume`, `IfcQuantityWeight` ou
+`IfcQuantityCount`.
+
+### Diferença essencial
+
+| Pergunta | Usar preferencialmente |
+|---|---|
+| É uma característica ou condição do objeto? | `Pset` |
+| É uma medição do objeto? | `Qto` |
+| É parte da identidade ou geometria fundamental da entidade IFC? | atributo IFC |
+| É uma relação com material, classificação ou documento? | associação IFC |
+
+Exemplo: `FireRating` é uma característica e tende a ser mapeado em Pset.
+`GrossArea` é uma medição e tende a ser mapeada em Qto. `OverallWidth`, quando
+definido como atributo da entidade no schema adotado, deve ser tratado como
+atributo e não duplicado automaticamente em um Pset customizado.
+
+### Pset e Qto podem existir juntos?
+
+Sim. O mesmo objeto pode possuir simultaneamente:
+
+- atributos da entidade IFC;
+- Psets padronizados;
+- Qto padronizados;
+- associações de material ou classificação;
+- conjuntos customizados aprovados pelo projeto.
+
+Isso não significa que o mesmo requisito deva ser repetido em todos eles. Cada
+requisito deve ter um destino principal, escolhido segundo o schema, a
+finalidade de uso e a evidência da exportação.
+
+### Quando criar estrutura customizada
+
+Uma estrutura customizada somente deve ser adotada quando:
+
+1. o requisito é contratualmente necessário;
+2. não existe destino padronizado adequado no schema contratado;
+3. o dado pode ser produzido e mantido de forma confiável;
+4. a regra de nomeação foi aprovada;
+5. a exportação foi testada no IFC;
+6. o IDS consegue validar o destino efetivamente exportado.
+
+Para informação descritiva, usar `CUSTOM_PSET`. Para medição contratual sem
+destino padronizado, avaliar `CUSTOM_QTO`. Se a exportação ainda não estiver
+comprovada, registrar `UNVERIFIED`, nunca assumir o destino.
+
+### Regra de decisão para o Gate 2
+
+Para cada requisito, responder nesta ordem:
+
+1. Existe atributo IFC apropriado?
+2. Se for medição, existe Qto padronizado no schema contratado?
+3. Se for propriedade, existe Pset padronizado?
+4. Existe associação IFC mais adequada?
+5. A criação de Qto ou Pset customizado é indispensável?
+6. O exportador realmente produz essa estrutura?
+
+O IDS deve ser criado depois dessa decisão. Ele valida o dado no destino IFC;
+não transforma um parâmetro Revit em Pset ou Qto.
