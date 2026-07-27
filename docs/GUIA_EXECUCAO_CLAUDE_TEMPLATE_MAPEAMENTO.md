@@ -62,7 +62,7 @@ coincidência de nomes.
 |---|---|
 | 1 — Requisitos | `Entrada_Requisitos` preenchida e requisitos bloqueados identificados |
 | 2 — Origem | inventário de parâmetros nativos/compartilhados e candidatos por escopo |
-| 3 — Arquitetura | `Saida_Mapeamento`, SMR e proposta de parâmetros compartilhados quando necessária |
+| 3 — Arquitetura | `Saida_Mapeamento`, SMR e, após aprovação explícita da linha, TXT de parâmetros compartilhados, manifesto XML do Shared Parameters Tool, TXT de Psets, XML do Model Checker e plano JSON para Bonsai |
 | 4 — Exportação | configuração de exportação, IFC de prova e evidência por `GlobalId` |
 | 5 — IDS | IDS por disciplina, somente para destinos comprovados no IFC |
 | 6 — Validação | relatório IDS, falhas por requisito/`GlobalId` e consolidado do último modelo |
@@ -75,6 +75,22 @@ coincidência de nomes.
 - Sem correspondência confiável, usar `REVISAO_HUMANA` ou `KNOWLEDGE_GAP`.
 - Não criar Pset ou Qto customizado automaticamente.
 - Não editar Revit sem SMR aprovada e autorização humana explícita.
+
+## Geração física no Gate 3
+
+Depois que o responsável aprovar uma linha com
+`Aprovacao_Gate_3=APROVADO`, o coordenador prepara um JSON com as linhas
+aprovadas e executa:
+
+```powershell
+python scripts/gate3_artifacts.py matriz_aprovada.json --output output/gate3
+```
+
+O gerador recusa parâmetro compartilhado sem GUID válido e não inclui linhas
+pendentes. O XML do Shared Parameters Tool é um manifesto de configuração
+auditável: a compatibilidade de importação deve ser confirmada na versão do add-in
+instalada. O XML do Model Checker segue o checkset da Autodesk. Nenhum desses
+artefatos é evidência de IFC; a prova permanece no Gate 4.
 
 ## Referências
 

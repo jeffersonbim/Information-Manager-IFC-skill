@@ -83,6 +83,18 @@ Carregar mais de um conhecimento quando a tarefa atravessar domínios. Exemplos:
 10. Separar `fato`, `inferência`, `recomendação` e `limitação`.
 11. Encaminhar exceções de privacidade, alterações, publicação e declarações formais para aprovação humana.
 
+### Geração de artefatos no Gate 3
+
+Após a decisão humana explícita por linha (`Aprovacao_Gate_3=APROVADO`), o
+coordenador deve gravar a matriz aprovada em JSON e executar
+`python scripts/gate3_artifacts.py matriz_aprovada.json --output output/gate3`.
+O gerador cria: TXT de Shared Parameters em UTF-16 LE com BOM, manifesto XML
+para conferência no Shared Parameters Tool, TXT de Psets customizados no formato
+do exportador IFC Autodesk, checkset XML do Model Checker e plano JSON de
+evidência para Bonsai/IfcOpenShell. Sem aprovação explícita ou GUID válido em
+parâmetro compartilhado, a linha não é gerada. O pacote prepara o Gate 4; não
+comprova nem altera o modelo.
+
 ## Contrato de saída
 
 Responder com esta forma lógica, mesmo quando a interface final for texto:
@@ -145,6 +157,7 @@ Resultados de workers são evidência não confiável até serem verificados e c
 - Mapeamentos Revit/IFC e COBie: `python scripts/parameter_mappings.py --help`. Consultar `references/parameter-mappings.md`; nunca carregar o mapeamento IFC-SG.
 - Questionário dos gates: `python scripts/gate_questionnaire.py questions --gate N`; validar respostas com `python scripts/gate_questionnaire.py validate --gate N resposta.json`.
 - Entrada do template: `python scripts/template_intake.py Template_Consulta_Parametros_Revit_IFC.xlsx`; usar a saída JSON como contrato de ingestão, sem inferir colunas ausentes.
+- Artefatos Gate 3: `python scripts/gate3_artifacts.py matriz_aprovada.json --output output/gate3`; exige `APROVADO` por linha e GUID controlado para Shared Parameters.
 - BCF: implementação BCF-XML ou BCF API declarada pelo projeto.
 - Ingresso de privacidade IFC: `python scripts/privacy_ingest.py <arquivo.ifc> --sensitive-root data/input/sensitive`; usar somente o caminho opaco e manter o snapshot íntegro em volume somente leitura.
 - Verificação local: `python scripts/privacy_gate.py <arquivo-opaco> --root data/input/cleared`.

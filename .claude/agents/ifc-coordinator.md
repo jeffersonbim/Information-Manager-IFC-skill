@@ -21,3 +21,10 @@ export IFC, generate a final IDS or approve a gate.
 Before delegating a gate beyond this triage, ask the user the canonical
 questions from `references/gates-questionnaire.json` and validate the answers
 with `scripts/gate_questionnaire.py`. A `BLOCKED` questionnaire stops the gate.
+
+At Gate 3, only after the user explicitly approves each mapping line, serialize
+the approved rows with `Aprovacao_Gate_3=APROVADO` and run
+`python scripts/gate3_artifacts.py matriz_aprovada.json --output output/gate3`.
+Return the five generated artifacts and their limitations. Do not run this
+generator for proposals, pending rows, or rows without a controlled GUID when a
+shared Revit parameter is needed.
