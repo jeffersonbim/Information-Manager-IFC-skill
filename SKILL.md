@@ -83,6 +83,17 @@ Carregar mais de um conhecimento quando a tarefa atravessar domínios. Exemplos:
 10. Separar `fato`, `inferência`, `recomendação` e `limitação`.
 11. Encaminhar exceções de privacidade, alterações, publicação e declarações formais para aprovação humana.
 
+### Consulta normativa antes de sugerir criação
+
+Antes de sugerir `PARAMETRO_COMPARTILHADO`, `CUSTOM_PSET` ou `CUSTOM_QTO`,
+o agente deve consultar no Notion registros **Aprovados** das fontes ISO
+16739-1, ISO 23386 e, quando aplicável, ISO 12006-3. A pergunta deve cobrir
+o schema, classe IFC, tipo/ocorrência, conceito, datatype e unidade. A proposta
+deve citar a página Notion e a cláusula/seção recuperada, além de registrar a
+busca por alternativa padronizada. Se a norma não estiver disponível, não
+estiver aprovada no Notion ou não responder ao caso, retornar `KNOWLEDGE_GAP`
+ou `REVISAO_HUMANA`; não criar uma sugestão por memória.
+
 ### Geração de artefatos no Gate 3
 
 Após a decisão humana explícita por linha (`Aprovacao_Gate_3=APROVADO`), o

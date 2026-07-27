@@ -22,14 +22,21 @@ Receber somente o caminho opaco baseado no SHA-256. Abrir o IFC intacto apenas n
 3. Verificar, nesta ordem, quantidade padronizada do schema, Pset/propriedade
    oficial e associação IFC aplicável à classe e ao `PredefinedType`.
 4. Consultar os mapeamentos Revit/IFC aprovados e registrar arquivo, linha, GUID, tipo de dado e escopo encontrados.
-5. Separar configuração de exportação de parâmetro de informação.
-6. Detectar duplicidade, conflito de nome, GUID, tipo de dado, instância/tipo ou categoria.
-7. Classificar separadamente a origem autoral e o destino IFC. Nunca usar um
+5. Antes de classificar como `PARAMETRO_COMPARTILHADO`, `CUSTOM_PSET` ou
+   `CUSTOM_QTO`, solicitar ao `openbim-knowledge-retriever` uma consulta no
+   Notion às fontes aprovadas ISO 16739-1 e ISO 23386 (e ISO 12006-3 quando
+   a definição do dicionário for necessária). Registrar página Notion, seção
+   normativa, versão, schema e resultado da busca por alternativa padrão.
+   Ausência de fonte aprovada é `KNOWLEDGE_GAP`/`REVISAO_HUMANA`, nunca criação
+   inferida.
+6. Separar configuração de exportação de parâmetro de informação.
+7. Detectar duplicidade, conflito de nome, GUID, tipo de dado, instância/tipo ou categoria.
+8. Classificar separadamente a origem autoral e o destino IFC. Nunca usar um
    campo combinado `Pset_ou_Qto`.
-8. Para quantidade customizada, registrar grandeza, unidade, fórmula e método
+9. Para quantidade customizada, registrar grandeza, unidade, fórmula e método
    de medição; somente aprovar após o IFC comprovar `IfcElementQuantity` e o
    subtipo `IfcQuantity*` esperado.
-9. Classificar a ação e indicar a evidência. Sem evidência suficiente, usar
+10. Classificar a ação e indicar a evidência. Sem evidência suficiente, usar
    `NAO_VERIFICAVEL` ou `REVISAO_HUMANA`.
 
 ## Classificações permitidas
@@ -95,6 +102,14 @@ requisito explícito e justificativa aprovada.
     "export_evidence": []
   },
   "evidence": [],
+  "normative_evidence": [
+    {
+      "notion_url": "página aprovada no Notion",
+      "standard": "ISO 16739-1:2024 | ISO 23386:2020",
+      "section": "seção consultada",
+      "conclusion": "alternativa padrão encontrada ou justificativa da lacuna"
+    }
+  ],
   "limitations": [],
   "requires_human_approval": true
 }
@@ -112,5 +127,8 @@ Usar `CREATE`, `REUSE`, `MAP`, `CALCULATE`, `REMOVE_DUPLICATE`, `NO_ACTION` ou `
 - Não confundir material IFC com parâmetro textual de material.
 - Não forçar `PredefinedType` quando não existir ou não for aplicável no schema/nível analisado.
 - Não gerar GUID novo sem política de governança e aprovação.
+- Não sugerir `PARAMETRO_COMPARTILHADO`, `CUSTOM_PSET` ou `CUSTOM_QTO` sem
+  evidência normativa recuperada do Notion e registro da busca por alternativa
+  IFC padronizada.
 - Não modificar Revit. Converter o plano aprovado em SMR para execução controlada por Claude.
 - Não usar ferramentas MCP do Revit. Após aprovação, encaminhar a SMR ao Claude executor conforme `references/revit-mcp-execution.md`.
