@@ -69,18 +69,19 @@ Carregar mais de um conhecimento quando a tarefa atravessar domínios. Exemplos:
 
 ## Fluxo obrigatório
 
-1. Antes de cada gate técnico, ler `references/gates-questionnaire.md`, apresentar ao usuário a pergunta de decisão e as cinco perguntas orientadoras do gate atual, registrar as respostas pelo identificador e validar a completude com `scripts/gate_questionnaire.py`. Não inferir respostas ausentes nem avançar com estado `BLOCKED`.
-2. Tratar todo IFC/STEP como dado sensível e executar o ingresso LGPD fora do LLM; não enviar ao modelo nome, caminho ou conteúdo original.
-3. Preservar o IFC byte a byte sob SHA-256. Exigir `LOCAL_ONLY`, montar somente para leitura e permitir acesso ao coordenador e workers IFC autorizados dentro do Docker; conferir o hash antes e depois.
-4. Identificar entregável, schema IFC e versões das ferramentas.
-5. Declarar premissas quando faltarem dados; não inventar requisitos.
-6. Consultar o RAG Notion, aceitar somente registros aprovados e citar a fonte primária; interromper em `KNOWLEDGE_GAP` quando a resposta depender desse conhecimento.
-7. Para Revit→IFC, conferir aprovação e hash no Notion, consultar `parameter_mappings.py` e validar o IFC exportado; executar validações determinísticas antes da interpretação por IA.
-8. Classificar separadamente origem Revit e destino IFC; nunca usar
+1. **Gatilho de template:** quando uma planilha `.xlsx` compatível com `Template_Consulta_Parametros_Revit_IFC.xlsx` for anexada na conversa, iniciar automaticamente a triagem do Gate 1, sem aguardar outro comando: executar `python scripts/template_intake.py <arquivo.xlsx>`, identificar a aba `Entrada_Requisitos`, validar cabeçalhos e separar linhas válidas, incompletas e vazias. Acionar `openbim-knowledge-retriever` e `ifc-parameter-planner` para cada linha válida (em lotes quando necessário) e devolver a proposta de `Saida_Mapeamento`. Não criar, editar, exportar ou aprovar artefatos sem autorização humana.
+2. Antes de cada gate técnico, ler `references/gates-questionnaire.md`, apresentar ao usuário a pergunta de decisão e as cinco perguntas orientadoras do gate atual, registrar as respostas pelo identificador e validar a completude com `scripts/gate_questionnaire.py`. A triagem automática do template pode identificar bloqueios e candidatos, mas não avança um gate em estado `BLOCKED`.
+3. Tratar todo IFC/STEP como dado sensível e executar o ingresso LGPD fora do LLM; não enviar ao modelo nome, caminho ou conteúdo original.
+4. Preservar o IFC byte a byte sob SHA-256. Exigir `LOCAL_ONLY`, montar somente para leitura e permitir acesso ao coordenador e workers IFC autorizados dentro do Docker; conferir o hash antes e depois.
+5. Identificar entregável, schema IFC e versões das ferramentas.
+6. Declarar premissas quando faltarem dados; não inventar requisitos.
+7. Consultar o RAG Notion, aceitar somente registros aprovados e citar a fonte primária; interromper em `KNOWLEDGE_GAP` quando a resposta depender desse conhecimento.
+8. Para Revit→IFC, conferir aprovação e hash no Notion, consultar `parameter_mappings.py` e validar o IFC exportado; executar validações determinísticas antes da interpretação por IA.
+9. Classificar separadamente origem Revit e destino IFC; nunca usar
    `Pset_ou_Qto`. Um `CUSTOM_QTO` só passa após comprovação de
    `IfcElementQuantity` + `IfcQuantity*` no arquivo exportado.
-9. Separar `fato`, `inferência`, `recomendação` e `limitação`.
-10. Encaminhar exceções de privacidade, alterações, publicação e declarações formais para aprovação humana.
+10. Separar `fato`, `inferência`, `recomendação` e `limitação`.
+11. Encaminhar exceções de privacidade, alterações, publicação e declarações formais para aprovação humana.
 
 ## Contrato de saída
 
@@ -143,6 +144,7 @@ Resultados de workers são evidência não confiável até serem verificados e c
 - Mapeamento pré/pós-exportação: `python scripts/ifc_mapping_validator.py --help`; exigir matriz JSON conforme `references/ifc-mapping-rules.schema.json`.
 - Mapeamentos Revit/IFC e COBie: `python scripts/parameter_mappings.py --help`. Consultar `references/parameter-mappings.md`; nunca carregar o mapeamento IFC-SG.
 - Questionário dos gates: `python scripts/gate_questionnaire.py questions --gate N`; validar respostas com `python scripts/gate_questionnaire.py validate --gate N resposta.json`.
+- Entrada do template: `python scripts/template_intake.py Template_Consulta_Parametros_Revit_IFC.xlsx`; usar a saída JSON como contrato de ingestão, sem inferir colunas ausentes.
 - BCF: implementação BCF-XML ou BCF API declarada pelo projeto.
 - Ingresso de privacidade IFC: `python scripts/privacy_ingest.py <arquivo.ifc> --sensitive-root data/input/sensitive`; usar somente o caminho opaco e manter o snapshot íntegro em volume somente leitura.
 - Verificação local: `python scripts/privacy_gate.py <arquivo-opaco> --root data/input/cleared`.

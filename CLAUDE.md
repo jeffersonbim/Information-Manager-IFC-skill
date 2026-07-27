@@ -2,6 +2,8 @@
 
 Use `.claude/skills/information-manager-ifc/SKILL.md` for every IFC, IDS, IDM, ISO 19650, bSDD, BCF or Revit-to-IFC task.
 
+- When a compatible `Template_Consulta_Parametros_Revit_IFC.xlsx` is attached, treat it as an automatic intake trigger: validate it with `scripts/template_intake.py` and start read-only mapping triage only for rows with all mandatory fields.
+
 - Keep IFC inputs local and read-only.
 - Treat every IFC/STEP as sensitive. Require `LOCAL_ONLY`, byte-for-byte SHA-256 integrity and an isolated read-only Docker mount. Authorized IFC agents may read the intact artifact; never transfer it to unapproved external services.
 - Run deterministic tools before interpretation.

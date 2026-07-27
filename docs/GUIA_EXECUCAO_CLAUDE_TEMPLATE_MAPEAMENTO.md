@@ -29,10 +29,16 @@ coincidência de nomes.
 
 ## Consulta de mapeamento para uma matriz Excel
 
-1. Use `templates/Template_Consulta_Parametros_Revit_IFC.xlsx` como entrada.
-2. Leia cada linha da aba `Entrada_Requisitos`.
-3. Rejeite apenas linhas sem os campos essenciais: código, descrição,
+1. Anexe `templates/Template_Consulta_Parametros_Revit_IFC.xlsx` preenchido na
+   conversa. O anexo é o gatilho: o coordenador inicia a ingestão sem exigir um
+   comando adicional.
+2. O coordenador executa `scripts/template_intake.py`, lê cada linha da aba
+   `Entrada_Requisitos` e separa a entrada em `ready` e `blocked`.
+3. Somente linhas `ready` — com código, descrição,
    disciplina, categoria Revit e schema IFC.
+   — acionam o `openbim-knowledge-retriever` e o
+   `ifc-parameter-planner`. Linhas `blocked` retornam com os campos ausentes e
+   não são enviadas aos agentes técnicos.
 4. O `openbim-knowledge-retriever` consulta no Notion somente conjuntos
    `Aprovado`, confere o SHA-256 e retorna a fonte aplicável.
 5. O `ifc-parameter-planner` consulta a base local com, por exemplo:
