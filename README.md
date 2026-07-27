@@ -111,6 +111,22 @@ Um `CUSTOM_QTO` só é aprovado no Gate 4 quando o IFC exportado comprova
 Para definir presença opcional, obrigatória e multiplicidade dos valores,
 consulte o [Guia técnico de cardinalidade em requisitos BIM e IDS](docs/guias/Guia_Cardinalidade_Requisitos_IDS.md).
 
+## Operação por seis gates
+
+O processo técnico começa pelo PIR (a decisão que a informação precisa apoiar),
+traduz o requisito em EIR e formaliza em IDS somente o que for comprovável no
+IFC. Para executar o ciclo completo, use:
+
+- [Guia operacional dos seis gates](docs/GUIA_OPERACIONAL_SEIS_GATES_IFC.md);
+- [Nota conceitual PIR, EIR e Gates](docs/NOTA_CONCEITUAL_PIR_EIR_GATES.md);
+- [Guia de execução no Claude Code: template, consulta e evidência](docs/GUIA_EXECUCAO_CLAUDE_TEMPLATE_MAPEAMENTO.md).
+
+O template Excel é a entrada da consulta. O agente consulta o catálogo técnico
+aprovado no Notion, confronta a hipótese com os snapshots determinísticos e
+devolve a proposta para revisão humana. Nenhuma proposta equivale a prova de
+exportação: o Gate 4 ainda exige o IFC real e o Gate 5 só recebe requisitos
+comprovados.
+
 ## Liberação
 
 O primeiro uso deve ocorrer como produção assistida. Os critérios para
