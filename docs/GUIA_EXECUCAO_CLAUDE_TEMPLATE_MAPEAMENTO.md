@@ -72,6 +72,10 @@ coincidência de nomes.
 - O Notion não recebe IFC, planilhas de projeto, conversas ou resultados de
   validação.
 - O parser retorna candidatos; schema e IFC exportado são a prova final.
+- Enquanto ISO 16739-1, ISO 23386 e ISO 12006-3 não estiverem disponíveis no
+  Notion, a proposta usa `BASE_TECNICA_A_CONFIRMAR`: princípios consolidados
+  da skill e documentação pública buildingSMART. Ela permite pesquisa e
+  recomendação, mas não declaração de conformidade ISO.
 - Sem correspondência confiável, usar `REVISAO_HUMANA` ou `KNOWLEDGE_GAP`.
 - Não criar Pset ou Qto customizado automaticamente.
 - Não editar Revit sem SMR aprovada e autorização humana explícita.

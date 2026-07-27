@@ -90,9 +90,15 @@ o agente deve consultar no Notion registros **Aprovados** das fontes ISO
 16739-1, ISO 23386 e, quando aplicável, ISO 12006-3. A pergunta deve cobrir
 o schema, classe IFC, tipo/ocorrência, conceito, datatype e unidade. A proposta
 deve citar a página Notion e a cláusula/seção recuperada, além de registrar a
-busca por alternativa padronizada. Se a norma não estiver disponível, não
-estiver aprovada no Notion ou não responder ao caso, retornar `KNOWLEDGE_GAP`
-ou `REVISAO_HUMANA`; não criar uma sugestão por memória.
+busca por alternativa padronizada.
+
+Quando essas normas ainda não estiverem disponíveis no Notion, ativar
+`BASE_TECNICA_A_CONFIRMAR`: usar os princípios consolidados na skill e a
+documentação pública oficial buildingSMART para pesquisar a alternativa IFC,
+sem declarar conformidade ISO. A proposta deve trazer URL pública, fato,
+inferência, recomendação e limitação. A ausência do PDF não bloqueia a pesquisa
+nem a proposta, mas bloqueia aprovação normativa, criação definitiva de GUID e
+geração final dos artefatos do Gate 3 até a decisão humana.
 
 ### Geração de artefatos no Gate 3
 

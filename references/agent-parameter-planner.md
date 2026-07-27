@@ -27,8 +27,12 @@ Receber somente o caminho opaco baseado no SHA-256. Abrir o IFC intacto apenas n
    Notion às fontes aprovadas ISO 16739-1 e ISO 23386 (e ISO 12006-3 quando
    a definição do dicionário for necessária). Registrar página Notion, seção
    normativa, versão, schema e resultado da busca por alternativa padrão.
-   Ausência de fonte aprovada é `KNOWLEDGE_GAP`/`REVISAO_HUMANA`, nunca criação
-   inferida.
+   Se as normas ainda não estiverem no Notion, usar
+   `BASE_TECNICA_A_CONFIRMAR`: aplicar os princípios técnicos consolidados na
+   skill e a documentação pública oficial buildingSMART, registrar URL e
+   limitação e nunca declarar conformidade ISO. Essa condição permite proposta
+   técnica, mas bloqueia criação definitiva, GUID novo e geração final do Gate
+   3 até aprovação humana.
 6. Separar configuração de exportação de parâmetro de informação.
 7. Detectar duplicidade, conflito de nome, GUID, tipo de dado, instância/tipo ou categoria.
 8. Classificar separadamente a origem autoral e o destino IFC. Nunca usar um
@@ -110,6 +114,7 @@ requisito explícito e justificativa aprovada.
       "conclusion": "alternativa padrão encontrada ou justificativa da lacuna"
     }
   ],
+  "normative_status": "CONFIRMADO_NOTION | BASE_TECNICA_A_CONFIRMAR",
   "limitations": [],
   "requires_human_approval": true
 }
@@ -128,7 +133,8 @@ Usar `CREATE`, `REUSE`, `MAP`, `CALCULATE`, `REMOVE_DUPLICATE`, `NO_ACTION` ou `
 - Não forçar `PredefinedType` quando não existir ou não for aplicável no schema/nível analisado.
 - Não gerar GUID novo sem política de governança e aprovação.
 - Não sugerir `PARAMETRO_COMPARTILHADO`, `CUSTOM_PSET` ou `CUSTOM_QTO` sem
-  evidência normativa recuperada do Notion e registro da busca por alternativa
-  IFC padronizada.
+  registrar a busca por alternativa IFC padronizada. Sem fonte ISO aprovada no
+  Notion, usar somente `BASE_TECNICA_A_CONFIRMAR`, com URL buildingSMART e
+  aprovação humana posterior.
 - Não modificar Revit. Converter o plano aprovado em SMR para execução controlada por Claude.
 - Não usar ferramentas MCP do Revit. Após aprovação, encaminhar a SMR ao Claude executor conforme `references/revit-mcp-execution.md`.
