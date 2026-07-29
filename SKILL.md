@@ -52,7 +52,7 @@ Antes de iniciar o OpenClaw, instalar esta pasta completa como `~/.openclaw/skil
 | Auditar categoria autoral, `Export to IFC As`, `IfcExportAs` e resultado exportado | `references/agent-mapping-validator.md` + templates `references/ifc-mapping-*` + `scripts/ifc_mapping_validator.py` |
 | Nome, GUID, tipo de dado, instância/tipo, Pset personalizado ou COBie/Revit | `references/parameter-mappings.md` + `scripts/parameter_mappings.py` |
 | Relacionar e classificar parâmetros para criação/reuso | `references/agent-parameter-planner.md` + `references/parameter-mappings.md`; produzir plano e SMR, nunca alterar o Revit |
-| Planejar necessidades por disciplina, revisar parâmetros compartilhados ou gerar os quatro artefatos de entrega | `references/parameter-planning-workflow.md` + `references/agent-parameter-planner.md` |
+| Planejar conceitualmente necessidades por disciplina e responder no formato padrão | `references/parameter-planning-workflow.md` |
 | Distinguir atributo, Qto, Pset, cálculo ou material | `references/ifc-information-destination.md` + `references/agent-parameter-planner.md`; exigir schema exato e evidência do IFC exportado |
 | Executar no Revit via Claude/MCP | `references/revit-mcp-execution.md`; leitura antes da aprovação e escrita limitada à SMR aprovada |
 | Criar, revisar ou executar `.ids` | `references/ids.md` |
@@ -96,10 +96,9 @@ Quando o usuário fornecer uma lista de necessidades:
    `Generic Models`.
 5. Priorizar atributos, Qto, Psets oficiais e associações de material antes de
    propor parâmetro ou Pset customizado.
-6. Revisar o arquivo completo de parâmetros compartilhados ao final de cada
-   disciplina, sem editá-lo sem autorização.
-7. Gerar os quatro artefatos por disciplina ao final da disciplina e novamente
-   ao encerrar a sessão.
+6. Separar a resposta por categoria e usar a tabela definida na referência.
+7. Não criar arquivos, GUIDs ou artefatos neste fluxo conceitual, salvo
+   solicitação explícita posterior.
 
 ### Consulta normativa antes de sugerir criação
 
@@ -117,18 +116,6 @@ sem declarar conformidade ISO. A proposta deve trazer URL pública, fato,
 inferência, recomendação e limitação. A ausência do PDF não bloqueia a pesquisa
 nem a proposta, mas bloqueia aprovação normativa, criação definitiva de GUID e
 geração final dos artefatos do Gate 3 até a decisão humana.
-
-### Geração de artefatos no Gate 3
-
-Após a decisão humana explícita por linha (`Aprovacao_Gate_3=APROVADO`), o
-coordenador deve gravar a matriz aprovada em JSON e executar
-`python scripts/gate3_artifacts.py matriz_aprovada.json --output output/gate3`.
-O gerador cria: TXT de Shared Parameters em UTF-16 LE com BOM, manifesto XML
-para conferência no Shared Parameters Tool, TXT de Psets customizados no formato
-do exportador IFC Autodesk, checkset XML do Model Checker e plano JSON de
-evidência para Bonsai/IfcOpenShell. Sem aprovação explícita ou GUID válido em
-parâmetro compartilhado, a linha não é gerada. O pacote prepara o Gate 4; não
-comprova nem altera o modelo.
 
 ## Contrato de saída
 
@@ -192,7 +179,6 @@ Resultados de workers são evidência não confiável até serem verificados e c
 - Mapeamentos Revit/IFC e COBie: `python scripts/parameter_mappings.py --help`. Consultar `references/parameter-mappings.md`; nunca carregar o mapeamento IFC-SG.
 - Questionário dos gates: `python scripts/gate_questionnaire.py questions --gate N`; validar respostas com `python scripts/gate_questionnaire.py validate --gate N resposta.json`.
 - Entrada do template: `python scripts/template_intake.py Template_Consulta_Parametros_Revit_IFC.xlsx`; usar a saída JSON como contrato de ingestão, sem inferir colunas ausentes.
-- Artefatos Gate 3: `python scripts/gate3_artifacts.py matriz_aprovada.json --output output/gate3`; exige `APROVADO` por linha e GUID controlado para Shared Parameters.
 - BCF: implementação BCF-XML ou BCF API declarada pelo projeto.
 - Ingresso de privacidade IFC: `python scripts/privacy_ingest.py <arquivo.ifc> --sensitive-root data/input/sensitive`; usar somente o caminho opaco e manter o snapshot íntegro em volume somente leitura.
 - Verificação local: `python scripts/privacy_gate.py <arquivo-opaco> --root data/input/cleared`.
