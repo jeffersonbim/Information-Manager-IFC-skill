@@ -1,120 +1,94 @@
-# Fluxo simples de análise e criação de parâmetros
+# Planejamento conceitual de informações Revit–IFC
 
 ## Objetivo
 
-Transformar necessidades de informação em uma decisão única e executável para
-Revit e IFC2x3, responder primeiro na tela e gerar os artefatos técnicos ao fim
-de cada disciplina e de cada sessão.
+Transformar cada necessidade em uma decisão única para autoria BIM e
+intercâmbio IFC. Responder na tela; não criar arquivos, GUIDs ou artefatos nesse
+fluxo, salvo solicitação explícita posterior.
 
-## Entrada
+## Princípios
 
-Receber uma linha por necessidade com, quando disponíveis:
+1. Classificar o elemento pela função real.
+2. Usar categoria Revit específica, escrita em inglês.
+3. Trabalhar somente no schema IFC solicitado.
+4. Priorizar conteúdo padronizado antes de propor conteúdo customizado.
+5. Não duplicar a mesma informação em destinos diferentes.
+6. Apresentar uma única decisão por campo.
+7. Não usar `Generic Models`.
 
-- disciplina;
-- descrição do elemento;
-- grupo;
-- parâmetro solicitado;
-- unidade de medida;
-- descrição ou exemplo do valor.
+## Ordem da análise
 
-Normalizar erros de digitação sem mudar o significado. Preservar códigos,
-referências contratuais e nomes aprovados.
+Para cada necessidade:
 
-## Análise por linha
+1. identificar a disciplina responsável;
+2. definir uma categoria Revit;
+3. definir uma classe IFC compatível com a função;
+4. verificar se a informação é nativa;
+5. verificar se existe definição reutilizável;
+6. classificar a situação como `NATIVE`, `REUSE` ou `CUSTOM`;
+7. definir exatamente um parâmetro;
+8. definir o escopo como `Instância` ou `Tipo`;
+9. definir exatamente um destino IFC;
+10. definir tipo de dado e unidade;
+11. apresentar uma recomendação executável.
 
-Executar nesta ordem:
+## Prioridade do destino IFC
 
-1. Relacionar a disciplina à categoria Revit, escrita em inglês.
-2. Relacionar a categoria a uma única classe IFC2x3 aplicável.
-3. Verificar se a informação já é nativa no Revit.
-4. Verificar se existe destino IFC2x3 padronizado nesta ordem:
-   atributo, quantidade oficial, Pset oficial e associação de material.
-5. Se for nativo, usar o nome nativo exato e indicar como preencher ou obter o
-   valor.
-6. Se não for nativo, sugerir um único nome de parâmetro compartilhado, sem
-   barras, alternativas ou sinônimos.
-7. Definir exatamente um escopo: `Instance` ou `Type`.
-8. Definir exatamente um destino IFC.
-9. Definir um tipo de dado e uma unidade coerentes com a grandeza.
-10. Informar uma única recomendação executável.
+Pesquisar nesta ordem:
 
-Não usar `Generic Models`. Classificar o objeto em sua categoria autoral
-específica. Tratar impermeabilização como sistema ou camada associado ao
-elemento hospedeiro aplicável, como `Walls`, `Floors` ou `Roofs`.
+1. atributo;
+2. quantidade oficial;
+3. propriedade oficial;
+4. associação de material;
+5. relação com sistema, classificação ou outro objeto;
+6. propriedade customizada.
 
-## Regras de decisão
+Nunca responder `Pset ou Qto`.
 
-- Tratar altura, largura, comprimento, espessura, área, volume e diâmetro como
+## Regras conceituais
+
+- Tratar altura, largura, comprimento, espessura, diâmetro, área e volume como
   dados geométricos básicos.
-- Encaminhar toda quantidade mensurável que possua template oficial IFC2x3 ao
-  `Qto_*BaseQuantities` aplicável.
-- Não criar Pset customizado para duplicar atributo, Qto, Pset oficial ou
-  associação de material.
-- Usar associação IFC de material quando o requisito for o material real do
-  elemento. Usar texto customizado somente quando o requisito for uma
-  classificação, descrição ou composição não representada pela associação.
-- Usar prefixo próprio, como `SUP_`, em Psets customizados. Nunca usar o prefixo
-  reservado `Pset_`.
-- Usar um único nome sugerido para parâmetro customizado e um único destino.
-- Usar `Number` para valores escalares sem unidade, `Boolean` para verdadeiro ou
-  falso, `Text` para códigos e enumerações controladas e o tipo físico adequado
-  para grandezas.
-- Não criar novo GUID se já existir parâmetro compartilhado semanticamente
-  equivalente e tecnicamente compatível.
-- Detectar e remover duplicidades antes de propor criação.
-- Quantidade de louças em paredes significa identificar paredes de áreas
-  molhadas; representar essa necessidade por `SUP_AreaMolhada` do tipo
-  verdadeiro/falso, e não por uma contagem de louças na parede.
+- Direcionar grandezas mensuráveis a quantidades IFC quando houver definição
+  aplicável no schema.
+- Representar o material real por associação de material.
+- Usar texto para descrição, classificação ou composição, não para substituir
+  material ou quantidade.
+- Relacionar elementos MEP ao sistema técnico quando essa relação estiver
+  disponível.
+- Separar fase do projeto de faseamento construtivo.
+- Usar `Tipo` para valores comuns às ocorrências e `Instância` para valores que
+  podem variar individualmente.
+- Usar texto controlado para enumerações e uma grafia única por valor.
+- Não sugerir um novo nome quando uma definição existente for semanticamente e
+  tecnicamente compatível.
 
-## Formato padrão na tela
+## Formato obrigatório de saída
 
-Responder em tabela tabulada, sem alternativas em uma mesma célula:
+Separar a resposta por categoria. Usar uma tabela por categoria:
 
-```text
-Necessidade	Disciplina	Categoria Revit	Classe IFC2x3	Situação	Parâmetro Revit	Escopo	Destino IFC	Tipo de dado	Unidade de medida	Recomendação
-```
+| Necessidade | Disciplina | Categoria Revit | Classe IFC | Situação | Parâmetro Revit | Escopo | Destino IFC | Tipo de dado | Unidade de medida | Recomendação |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Informação solicitada | Disciplina responsável | Categoria em inglês | Classe do schema | `NATIVE`, `REUSE` ou `CUSTOM` | Nome único | `Instância` ou `Tipo` | Destino único | Tipo coerente | Unidade ou `Sem unidade` | Ação única |
 
-Quando o usuário fornecer o formato de origem abaixo, devolver também nesse
-formato quando solicitado:
+## Regras da tabela
 
-```text
-DISCIPLINA	DESCRIÇÃO DO ELEMENTO	GRUPO	[PARÂMETROS]	UNIDADE DE MEDIDA	DESCRIÇÃO DO PARAMÊTRO
-```
+- Não incluir alternativas na mesma célula.
+- Usar o nome nativo exato quando a situação for `NATIVE`.
+- Sugerir um único nome normalizado quando a situação for `CUSTOM`.
+- Informar o caminho exato do destino IFC.
+- Declarar a unidade separadamente do nome do parâmetro.
+- Usar uma recomendação curta e executável.
 
-## Revisão do arquivo de parâmetros compartilhados
+## Exemplo
 
-Ao finalizar cada disciplina:
+| Necessidade | Disciplina | Categoria Revit | Classe IFC | Situação | Parâmetro Revit | Escopo | Destino IFC | Tipo de dado | Unidade de medida | Recomendação |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Comprimento | Disciplina responsável | `Categoria específica` | `IfcClasseAplicável` | `NATIVE` | `Length` | Instância | `BaseQuantities.Length` | Comprimento | m | Exportar como Qto |
+| Material | Disciplina responsável | `Categoria específica` | `IfcClasseAplicável` | `NATIVE` | `Material` | Tipo | `IfcRelAssociatesMaterial` | Material | Sem unidade | Exportar a associação |
+| Classificação | Disciplina responsável | `Categoria específica` | `IfcClasseAplicável` | `CUSTOM` | `ClassificacaoEspecifica` | Tipo | `SUP_Classification.ClassificationType` | Texto controlado | Sem unidade | Preencher com valor aprovado |
 
-1. Ler o arquivo completo autorizado pelo usuário.
-2. Comparar nome, GUID, grupo, tipo de dado e descrição.
-3. Reutilizar parâmetros compatíveis.
-4. Marcar conflito ou obsolescência; não apagar silenciosamente.
-5. Criar ou editar somente quando houver autorização explícita.
-6. Validar ausência de GUID, nome ou definição duplicados.
+## Limite
 
-## Pacote obrigatório por disciplina
-
-Ao finalizar cada disciplina e ao encerrar cada sessão, gerar ou atualizar:
-
-1. `revit_user_defined_psets_<disciplina>.txt`;
-2. `ids_<disciplina>.ids`;
-3. `export_interbility_tools_<disciplina>.xml`;
-4. `bonsai_csv_config_<disciplina>.json`.
-
-Executar `scripts/generate_conjunto_packages.js` quando a disciplina estiver
-suportada pelo gerador. Usar a pasta `Conjunto` por padrão. Se o usuário definir
-um destino em `D:`, confirmar que a unidade e o caminho existem antes de gravar;
-nunca inventar ou substituir silenciosamente por outro caminho.
-
-## Validação mínima do pacote
-
-- XML e IDS bem formados.
-- JSON parseável.
-- Nenhuma ocorrência ou vinculação a `Generic Models`.
-- Nenhum Pset customizado iniciado por `Pset_`.
-- Nomes e GUIDs referenciados existentes no arquivo compartilhado aprovado.
-- Um único destino por parâmetro.
-- Qto oficial não duplicado em Pset customizado.
-- IDS `0/0` reportado como falha de cobertura, nunca como conformidade.
-- Registrar limitações quando não houver validação contra o XSD IDS ou contra um
-  IFC exportado.
+A proposta é conceitual. Confirmar o resultado em um IFC exportado antes de
+declarar atendimento ou conformidade.
