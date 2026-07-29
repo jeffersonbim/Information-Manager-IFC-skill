@@ -52,6 +52,7 @@ Antes de iniciar o OpenClaw, instalar esta pasta completa como `~/.openclaw/skil
 | Auditar categoria autoral, `Export to IFC As`, `IfcExportAs` e resultado exportado | `references/agent-mapping-validator.md` + templates `references/ifc-mapping-*` + `scripts/ifc_mapping_validator.py` |
 | Nome, GUID, tipo de dado, instância/tipo, Pset personalizado ou COBie/Revit | `references/parameter-mappings.md` + `scripts/parameter_mappings.py` |
 | Relacionar e classificar parâmetros para criação/reuso | `references/agent-parameter-planner.md` + `references/parameter-mappings.md`; produzir plano e SMR, nunca alterar o Revit |
+| Planejar necessidades por disciplina, revisar parâmetros compartilhados ou gerar os quatro artefatos de entrega | `references/parameter-planning-workflow.md` + `references/agent-parameter-planner.md` |
 | Distinguir atributo, Qto, Pset, cálculo ou material | `references/ifc-information-destination.md` + `references/agent-parameter-planner.md`; exigir schema exato e evidência do IFC exportado |
 | Executar no Revit via Claude/MCP | `references/revit-mcp-execution.md`; leitura antes da aprovação e escrita limitada à SMR aprovada |
 | Criar, revisar ou executar `.ids` | `references/ids.md` |
@@ -82,6 +83,23 @@ Carregar mais de um conhecimento quando a tarefa atravessar domínios. Exemplos:
    `IfcElementQuantity` + `IfcQuantity*` no arquivo exportado.
 10. Separar `fato`, `inferência`, `recomendação` e `limitação`.
 11. Encaminhar exceções de privacidade, alterações, publicação e declarações formais para aprovação humana.
+
+## Planejamento simplificado de parâmetros
+
+Quando o usuário fornecer uma lista de necessidades:
+
+1. Ler `references/parameter-planning-workflow.md`.
+2. Analisar e responder primeiro na tela, usando uma única sugestão por campo.
+3. Trabalhar no schema solicitado; se declarado IFC2x3, não transportar classes,
+   enumerações, Psets ou Qto exclusivos de IFC4/IFC4.3.
+4. Usar categorias Revit em inglês e nunca classificar objetos como
+   `Generic Models`.
+5. Priorizar atributos, Qto, Psets oficiais e associações de material antes de
+   propor parâmetro ou Pset customizado.
+6. Revisar o arquivo completo de parâmetros compartilhados ao final de cada
+   disciplina, sem editá-lo sem autorização.
+7. Gerar os quatro artefatos por disciplina ao final da disciplina e novamente
+   ao encerrar a sessão.
 
 ### Consulta normativa antes de sugerir criação
 
